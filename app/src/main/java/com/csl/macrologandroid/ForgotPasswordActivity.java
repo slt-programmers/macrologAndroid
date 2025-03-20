@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.csl.macrologandroid.services.AuthenticationService;
 import com.csl.macrologandroid.util.ResetErrorTextWatcher;
 
-import io.reactivex.disposables.Disposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
 

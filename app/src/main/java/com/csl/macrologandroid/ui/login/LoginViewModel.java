@@ -9,7 +9,8 @@ import com.csl.macrologandroid.dtos.AuthenticationResponse;
 import com.csl.macrologandroid.models.LoginResult;
 import com.csl.macrologandroid.services.AuthenticationService;
 
-import io.reactivex.disposables.Disposable;
+import io.reactivex.rxjava3.disposables.Disposable;
+
 
 public class LoginViewModel extends ViewModel {
 
@@ -31,10 +32,10 @@ public class LoginViewModel extends ViewModel {
     public void authenticate(String username, String password) {
         this.disposable = this.authService.authenticate(username, password).subscribe(res -> {
             saveCredentials(res);
-            loginResult.setValue(new LoginResult(true, null));
+            loginResult.postValue(new LoginResult(true, null));
             this.disposable.dispose();
         }, err -> {
-            loginResult.setValue(new LoginResult(false, err));
+            loginResult.postValue(new LoginResult(false, err));
             this.disposable.dispose();
         });
     }

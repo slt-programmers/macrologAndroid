@@ -23,8 +23,9 @@ import com.csl.macrologandroid.util.DateParser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-import io.reactivex.disposables.Disposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 
 public class WeightChartActivity extends AppCompatActivity {
 
@@ -77,7 +78,7 @@ public class WeightChartActivity extends AppCompatActivity {
                     currentWeight = getCurrentWeight();
                     currentWeightTextView.setText(String.valueOf(currentWeight));
                     fillTable();
-                }, err -> Log.e(this.getLocalClassName(), err.getMessage()));
+                }, err -> Log.e(this.getLocalClassName(), Objects.requireNonNull(err.getMessage())));
     }
 
     private void sortWeightRequestsByDate() {
@@ -157,7 +158,7 @@ public class WeightChartActivity extends AppCompatActivity {
                                     hasBeenEdited = true;
                                     loadMeasurements();
                                 },
-                                err -> Log.e(this.getClass().toString(), err.getMessage())
+                                err -> Log.e(this.getClass().toString(), Objects.requireNonNull(err.getMessage()))
                         );
             }
         });

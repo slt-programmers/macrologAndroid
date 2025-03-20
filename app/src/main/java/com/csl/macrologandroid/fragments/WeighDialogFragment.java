@@ -21,7 +21,10 @@ import com.csl.macrologandroid.util.DateParser;
 import java.util.Date;
 import java.util.Objects;
 
+import lombok.Setter;
 
+
+@Setter
 public class WeighDialogFragment extends DialogFragment {
 
     private double currentWeight = 0.0;
@@ -35,7 +38,7 @@ public class WeighDialogFragment extends DialogFragment {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity());
 
-        LayoutInflater inflater = LayoutInflater.from(getContext());
+        LayoutInflater inflater = getLayoutInflater();
 
         @SuppressLint("InflateParams")
         ConstraintLayout dialogView = (ConstraintLayout) inflater.inflate(R.layout.dialog_weight, null);
@@ -63,14 +66,6 @@ public class WeighDialogFragment extends DialogFragment {
                 })
                 .setNegativeButton(R.string.cancel, (dialog, id) -> Objects.requireNonNull(getDialog()).cancel());
         return builder.create();
-    }
-
-    public void setCurrentWeight(double currentWeight) {
-        this.currentWeight = currentWeight;
-    }
-
-    public void setOnDialogResult(OnDialogResult onDialogResult) {
-        this.onDialogResult = onDialogResult;
     }
 
     public interface OnDialogResult {

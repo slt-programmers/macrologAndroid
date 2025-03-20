@@ -5,7 +5,7 @@ import com.csl.macrologandroid.models.Meal;
 import java.io.Serializable;
 import java.util.Date;
 
-public class LogEntryResponse implements Serializable {
+public class LogEntryResponse  {
 
     private int id;
 

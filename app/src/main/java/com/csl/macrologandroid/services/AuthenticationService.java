@@ -6,14 +6,13 @@ import com.csl.macrologandroid.dtos.AuthenticationResponse;
 import com.csl.macrologandroid.dtos.ChangePasswordRequest;
 
 import android.util.Base64;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
+
+import io.reactivex.rxjava3.core.Observable;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
 import retrofit2.http.POST;
@@ -38,7 +37,7 @@ public class AuthenticationService {
 
         Retrofit.Builder builder = new Retrofit.Builder()
                 .baseUrl(BuildConfig.SERVER_URL + "api/")
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create());
 
         apiService = builder.build().create(ApiService.class);
@@ -48,24 +47,24 @@ public class AuthenticationService {
     // The username field is used for both username and email when logging in
     // This is handled properly by the backend
     public Observable<AuthenticationResponse> authenticate(String username, String password) {
-        return apiService.authenticate(new AuthenticationRequest(username, "", password)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        return apiService.authenticate(new AuthenticationRequest(username, "", password));
     }
 
     public Observable<AuthenticationResponse> register(String username, String email, String password) {
-        return apiService.register((new AuthenticationRequest(username, email, password))).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        return apiService.register((new AuthenticationRequest(username, email, password)));
     }
 
     public Observable<ResponseBody> changePassword(String oldPassword, String newPassword, String confirmNew) {
-        return apiServiceWithBearer.changePassword(new ChangePasswordRequest(oldPassword, newPassword, confirmNew)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        return apiServiceWithBearer.changePassword(new ChangePasswordRequest(oldPassword, newPassword, confirmNew));
     }
 
     public Observable<ResponseBody> resetPassword(String email) {
-        return apiService.resetPassword(new AuthenticationRequest(null, email, null)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        return apiService.resetPassword(new AuthenticationRequest(null, email, null));
     }
 
     public Observable<ResponseBody> deleteAccount(String password) {
         String encryptedPassword = Base64.encodeToString(password.getBytes(), Base64.DEFAULT);
-        return apiServiceWithBearer.deleteAccount(encryptedPassword).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        return apiServiceWithBearer.deleteAccount(encryptedPassword);
     }
 
     private interface ApiService {

@@ -83,11 +83,11 @@ public class DateDialogFragment extends DialogFragment {
         return builder.create();
     }
 
-    void setCurrentDate(Date currentDate) {
+    public void setCurrentDate(Date currentDate) {
         this.currentDate = currentDate;
     }
 
-    void setOnDialogResult(OnDialogResult onDialogResult) {
+    public void setOnDialogResult(OnDialogResult onDialogResult) {
         this.onDialogResult = onDialogResult;
     }
 

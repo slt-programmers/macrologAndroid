@@ -25,7 +25,7 @@ import com.csl.macrologandroid.util.ResetErrorTextWatcher;
 
 import java.util.Objects;
 
-import io.reactivex.disposables.Disposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 import retrofit2.HttpException;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -93,11 +93,6 @@ public class RegisterActivity extends AppCompatActivity {
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity((intent));
         finish();
-    }
-
-    @Override
-    public void onBackPressed() {
-        toLogin();
     }
 
     @Override

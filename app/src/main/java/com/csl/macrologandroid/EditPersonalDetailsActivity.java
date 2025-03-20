@@ -33,8 +33,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import io.reactivex.Observable;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.disposables.Disposable;
+
 import okhttp3.ResponseBody;
 
 public class EditPersonalDetailsActivity extends AppCompatActivity {
@@ -216,7 +217,7 @@ public class EditPersonalDetailsActivity extends AppCompatActivity {
                             setResult(Activity.RESULT_OK, resultIntent);
                             finish();
                         }
-                    }, err -> Log.e(this.getLocalClassName(), err.getMessage()));
+                    }, err -> Log.e(this.getLocalClassName(), Objects.requireNonNull(err.getMessage())));
         }
     }
 
@@ -262,23 +263,13 @@ public class EditPersonalDetailsActivity extends AppCompatActivity {
         }
 
         String item = (String) editActivity.getSelectedItem();
-        String newActivity;
-        switch (item) {
-            case "Sedentary":
-                newActivity = "1.2";
-                break;
-            case "Moderately active":
-                newActivity = "1.55";
-                break;
-            case "Very active":
-                newActivity = "1.725";
-                break;
-            case "Extremely active":
-                newActivity = "1.9";
-                break;
-            default:
-                newActivity = DEFAULT_ACTIVITY;
-        }
+        String newActivity = switch (item) {
+            case "Sedentary" -> "1.2";
+            case "Moderately active" -> "1.55";
+            case "Very active" -> "1.725";
+            case "Extremely active" -> "1.9";
+            default -> DEFAULT_ACTIVITY;
+        };
 
         if (!String.valueOf(originalActivity).equals(newActivity)) {
             obsList.add(userService.putSetting(new SettingsResponse(null, "activity", newActivity)));

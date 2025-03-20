@@ -8,13 +8,11 @@ import com.csl.macrologandroid.util.DateParser;
 import java.util.Date;
 import java.util.List;
 
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
+import io.reactivex.rxjava3.core.Observable;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -40,7 +38,7 @@ public class ActivityService {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BuildConfig.SERVER_URL)
                 .client(client.build())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -48,12 +46,12 @@ public class ActivityService {
     }
 
     public Observable<List<ActivityResponse>> getActivitiesForDay(Date date) {
-        return apiService.getActivitiesForDay(DateParser.format(date)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        return apiService.getActivitiesForDay(DateParser.format(date));
     }
 
     public Observable<List<ActivityResponse>> postActivitiesForDay(List<ActivityRequest> activities, Date date) {
         String day = DateParser.format(date);
-        return apiService.postActivitiesForDay(day, activities).subscribeOn((Schedulers.io())).observeOn(AndroidSchedulers.mainThread());
+        return apiService.postActivitiesForDay(day, activities);
     }
 
     private interface ApiService {

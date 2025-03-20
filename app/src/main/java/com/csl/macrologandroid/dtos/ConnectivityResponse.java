@@ -1,16 +1,16 @@
 package com.csl.macrologandroid.dtos;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
+//import com.google.gson.annotations.Expose;
+//import com.google.gson.annotations.SerializedName;
 
 public class ConnectivityResponse {
 
-    @Expose
-    @SerializedName("image")
+//    @Expose
+//    @SerializedName("image")
     private String imageUrl;
 
-    @Expose
-    @SerializedName("name")
+//    @Expose
+//    @SerializedName("name")
     private String accountName;
 
     private long syncedApplicationId;

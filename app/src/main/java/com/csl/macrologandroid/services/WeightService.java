@@ -5,14 +5,12 @@ import com.csl.macrologandroid.dtos.WeightRequest;
 
 import java.util.List;
 
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
+import io.reactivex.rxjava3.core.Observable;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
@@ -35,7 +33,7 @@ public class WeightService {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BuildConfig.SERVER_URL)
                 .client(client.build())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .addConverterFactory(CustomGsonConverter.create())
                 .build();
 
@@ -43,11 +41,11 @@ public class WeightService {
     }
 
     public Observable<List<WeightRequest>> getAllMeasurements() {
-        return apiService.getAllMeasurements().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        return apiService.getAllMeasurements();
     }
 
     public Observable<ResponseBody> postMeasurement(WeightRequest weightRequest) {
-        return apiService.postMeasurement(weightRequest).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        return apiService.postMeasurement(weightRequest);
     }
 
     private interface ApiService {

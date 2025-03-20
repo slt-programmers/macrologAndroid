@@ -5,15 +5,16 @@ import android.os.Bundle;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.splashscreen.SplashScreen;
+//import androidx.core.splashscreen.SplashScreen;
 
 import com.csl.macrologandroid.lifecycle.Session;
 import com.csl.macrologandroid.services.HealthcheckService;
 
 import java.net.SocketTimeoutException;
+import java.util.Objects;
 
-import io.reactivex.Observable;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.rxjava3.disposables.Disposable;
+
 
 public class RoutingActivity extends AppCompatActivity {
 
@@ -25,9 +26,9 @@ public class RoutingActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
+//        SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
-        splashScreen.setKeepOnScreenCondition(() -> true );
+//        splashScreen.setKeepOnScreenCondition(() -> true );
 
         service = new HealthcheckService();
         token = getSharedPreferences("AUTH", MODE_PRIVATE).getString("TOKEN", null);
@@ -48,8 +49,7 @@ public class RoutingActivity extends AppCompatActivity {
 
     private void doHealthCheck() {
         callCounter++;
-        disposable = ((Observable<Boolean>) service.healthcheck(token))
-                .subscribe(
+        disposable = (service.healthcheck(token)).subscribe(
                         res -> {
                             if (expired == null) {
                                 startActivity(new Intent(RoutingActivity.this, MainActivity.class));
@@ -57,7 +57,7 @@ public class RoutingActivity extends AppCompatActivity {
                             finish();
                         },
                         err -> {
-                            Log.e(this.getLocalClassName(), err.getMessage());
+                            Log.e(this.getLocalClassName(), Objects.requireNonNull(err.getMessage()));
                             if (err instanceof SocketTimeoutException && callCounter < 4) {
                                 Log.e(this.getLocalClassName(), "retry: " + callCounter);
                                 doHealthCheck();

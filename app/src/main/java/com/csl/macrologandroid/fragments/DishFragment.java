@@ -33,10 +33,10 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.disposables.Disposable;
-
 import static android.content.Context.MODE_PRIVATE;
 import static android.view.KeyEvent.KEYCODE_ENTER;
+
+import io.reactivex.rxjava3.disposables.Disposable;
 
 public class DishFragment extends Fragment {
 

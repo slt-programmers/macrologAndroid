@@ -39,7 +39,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 
-import io.reactivex.disposables.Disposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 
 import static android.content.Context.MODE_PRIVATE;
 import static android.view.KeyEvent.KEYCODE_ENTER;

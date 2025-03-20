@@ -29,11 +29,11 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
-import io.reactivex.disposables.Disposable;
+//import io.reactivex.disposables.Disposable;
 
 public class ConnectivityActivity extends AppCompatActivity implements BitmapHandler {
 
-    private Disposable disposable;
+//    private Disposable disposable;
 
     private long applicationId;
 
@@ -62,7 +62,7 @@ public class ConnectivityActivity extends AppCompatActivity implements BitmapHan
         userService = new UserService(getToken());
 
         handleRedirect(intent);
-        handleGetSetting();
+//        handleGetSetting();
 
         Button backButton = findViewById(R.id.back_button);
         backButton.setOnClickListener(v -> finish());
@@ -84,27 +84,27 @@ public class ConnectivityActivity extends AppCompatActivity implements BitmapHan
         });
 
         Button stravaDisconnect = findViewById(R.id.strava_disconnect);
-        stravaDisconnect.setOnClickListener(v -> disposable = userService.deleteConnectivitySetting("STRAVA").subscribe(
-                res -> handleGetSetting(),
-                err -> Log.e(this.getLocalClassName(), err.getMessage())
-        ));
+//        stravaDisconnect.setOnClickListener(v -> disposable = userService.deleteConnectivitySetting("STRAVA").subscribe(
+//                res -> handleGetSetting(),
+//                err -> Log.e(this.getLocalClassName(), err.getMessage())
+//        ));
     }
 
-    private void handleGetSetting() {
-        disposable = userService.getConnectivitySetting("STRAVA").subscribe(
-                res -> {
-                    if (res.getSyncedAccountId() == 0L) {
-                        applicationId = res.getSyncedApplicationId();
-                        connectedLayout.setVisibility(View.GONE);
-                        notConnectedLayout.setVisibility(View.VISIBLE);
-                    } else {
-                        notConnectedLayout.setVisibility(View.GONE);
-                        setConnectedLayoutVisible(res);
-                    }
-                },
-                err -> Log.e(this.getLocalClassName(), err.getMessage())
-        );
-    }
+//    private void handleGetSetting() {
+//        disposable = userService.getConnectivitySetting("STRAVA").subscribe(
+//                res -> {
+//                    if (res.getSyncedAccountId() == 0L) {
+//                        applicationId = res.getSyncedApplicationId();
+//                        connectedLayout.setVisibility(View.GONE);
+//                        notConnectedLayout.setVisibility(View.VISIBLE);
+//                    } else {
+//                        notConnectedLayout.setVisibility(View.GONE);
+//                        setConnectedLayoutVisible(res);
+//                    }
+//                },
+//                err -> Log.e(this.getLocalClassName(), err.getMessage())
+//        );
+//    }
 
     private void handleRedirect(Intent intent) {
         Uri data = intent.getData();
@@ -115,14 +115,14 @@ public class ConnectivityActivity extends AppCompatActivity implements BitmapHan
                 List<String> scopeList = Arrays.asList(scope.split(","));
                 if (scopeList.contains("read") && scopeList.contains("activity:read_all") && code != null) {
                     ConnectivityRequest request = new ConnectivityRequest("code", code);
-                    disposable = userService.postConnectivitySetting("STRAVA", request).subscribe(
-                            res -> {
-                                setConnectedLayoutVisible(res);
-                                notConnectedLayout.setVisibility(View.GONE);
-                                accessError.setVisibility(View.GONE);
-                            },
-                            err -> Log.e(this.getLocalClassName(), err.getMessage())
-                    );
+//                    disposable = userService.postConnectivitySetting("STRAVA", request).subscribe(
+//                            res -> {
+//                                setConnectedLayoutVisible(res);
+//                                notConnectedLayout.setVisibility(View.GONE);
+//                                accessError.setVisibility(View.GONE);
+//                            },
+//                            err -> Log.e(this.getLocalClassName(), err.getMessage())
+//                    );
                 } else {
                     accessError.setVisibility(View.VISIBLE);
                 }
@@ -145,9 +145,9 @@ public class ConnectivityActivity extends AppCompatActivity implements BitmapHan
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (disposable != null) {
-            disposable.dispose();
-        }
+//        if (disposable != null) {
+//            disposable.dispose();
+//        }
     }
 
     @Override

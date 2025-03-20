@@ -5,13 +5,11 @@ import com.csl.macrologandroid.dtos.DishResponse;
 
 import java.util.List;
 
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
+import io.reactivex.rxjava3.core.Observable;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -35,7 +33,7 @@ public class DishService {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BuildConfig.SERVER_URL)
                 .client(client.build())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -43,11 +41,11 @@ public class DishService {
     }
 
     public Observable<List<DishResponse>> getAllDishes() {
-        return apiService.getAllDishes().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        return apiService.getAllDishes();
     }
 
     public Observable<DishResponse> postDish(DishResponse dish) {
-        return apiService.postDish(dish).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        return apiService.postDish(dish);
     }
 
     private interface ApiService {

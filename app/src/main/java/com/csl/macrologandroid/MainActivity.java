@@ -14,7 +14,8 @@ import com.csl.macrologandroid.cache.ActivityCache;
 import com.csl.macrologandroid.cache.DiaryLogCache;
 import com.csl.macrologandroid.cache.FoodCache;
 import com.csl.macrologandroid.cache.UserSettingsCache;
-import com.csl.macrologandroid.fragments.DiaryFragment;
+import com.csl.macrologandroid.databinding.ActivityMainBinding;
+import com.csl.macrologandroid.ui.diary.DiaryFragment;
 import com.csl.macrologandroid.fragments.DishFragment;
 import com.csl.macrologandroid.fragments.FoodFragment;
 import com.csl.macrologandroid.fragments.UserFragment;
@@ -29,6 +30,8 @@ public class MainActivity extends AppCompatActivity implements UserFragment.OnLo
 
     private BottomNavigationView navigation;
 
+    private ActivityMainBinding binding;
+
     private final ActivityResultLauncher<Intent> loginRegisterForResult =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                     result -> {
@@ -41,25 +44,25 @@ public class MainActivity extends AppCompatActivity implements UserFragment.OnLo
                     });
 
     private final NavigationBarView.OnItemSelectedListener mOnNavigationItemSelectedListener = item -> {
-        switch (item.getItemId()) {
-            case R.id.navigation_diary:
-                setFragment(new DiaryFragment());
-                return true;
-            case R.id.navigation_food:
-                setFragment(new FoodFragment());
-                return true;
-            case R.id.navigation_dish:
-                setFragment(new DishFragment());
-                return true;
-            case R.id.navigation_user:
-                UserFragment userFragment = new UserFragment();
-                userFragment.setOnLogoutPressedListener(this::logout);
-                setFragment(userFragment);
-                return true;
-            default:
-                setFragment(new DiaryFragment());
+        final var itemId = item.getItemId();
+        if (R.id.navigation_diary == itemId) {
+            setFragment(new DiaryFragment());
+            return true;
+        } else if (R.id.navigation_food == itemId) {
+            setFragment(new FoodFragment());
+            return true;
+        } else if (R.id.navigation_dish == itemId) {
+            setFragment(new DishFragment());
+            return true;
+        } else if (R.id.navigation_user == itemId) {
+            UserFragment userFragment = new UserFragment();
+            userFragment.setOnLogoutPressedListener(this::logout);
+            setFragment(userFragment);
+            return true;
+        } else {
+            setFragment(new DiaryFragment());
+            return false;
         }
-        return false;
     };
 
     @Override

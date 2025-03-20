@@ -5,14 +5,12 @@ import com.csl.macrologandroid.dtos.FoodResponse;
 
 import java.util.List;
 
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
+import io.reactivex.rxjava3.core.Observable;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -36,7 +34,7 @@ public class FoodService {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BuildConfig.SERVER_URL)
                 .client(client.build())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -44,11 +42,11 @@ public class FoodService {
     }
 
     public Observable<List<FoodResponse>> getAllFood() {
-        return apiService.getAlFood().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        return apiService.getAlFood();
     }
 
     public Observable<ResponseBody> postFood(FoodResponse food) {
-        return apiService.postFood(food).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        return apiService.postFood(food);
     }
 
     private interface ApiService {

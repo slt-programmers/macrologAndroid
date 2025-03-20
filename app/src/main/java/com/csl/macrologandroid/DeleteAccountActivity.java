@@ -13,7 +13,7 @@ import com.csl.macrologandroid.services.AuthenticationService;
 
 import java.util.Objects;
 
-import io.reactivex.disposables.Disposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 import retrofit2.HttpException;
 
 public class DeleteAccountActivity extends AppCompatActivity {

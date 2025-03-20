@@ -15,7 +15,7 @@ import com.csl.macrologandroid.services.AuthenticationService;
 
 import java.util.Objects;
 
-import io.reactivex.disposables.Disposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 
 public class ChangePasswordActivity extends AppCompatActivity {
 

@@ -33,9 +33,12 @@ import com.csl.macrologandroid.services.UserService;
 
 import org.jetbrains.annotations.NotNull;
 
-import io.reactivex.disposables.Disposable;
+import io.reactivex.rxjava3.disposables.Disposable;
+import lombok.Setter;
 
 import static android.content.Context.MODE_PRIVATE;
+
+import java.util.Objects;
 
 public class UserFragment extends Fragment {
 
@@ -43,6 +46,7 @@ public class UserFragment extends Fragment {
     private UserSettingsResponse userSettings;
 
     private Disposable settingsDisposable;
+    @Setter
     private OnLogoutPressedListener onLogoutPressedListener;
 
     private final ActivityResultLauncher<Intent> editDetailsForResult = registerForActivityResult(
@@ -136,10 +140,6 @@ public class UserFragment extends Fragment {
         }
     }
 
-    public void setOnLogoutPressedListener(OnLogoutPressedListener listener) {
-        onLogoutPressedListener = listener;
-    }
-
     private void fetchUserSettings() {
         UserService userService = new UserService(getToken());
         settingsDisposable = userService.getUserSettings()
@@ -149,7 +149,7 @@ public class UserFragment extends Fragment {
                             this.userSettings = res;
                             setUserData();
                         },
-                        err -> Log.e(this.getClass().getName(), err.getMessage())
+                        err -> Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage()))
                 );
     }
 
@@ -179,23 +179,13 @@ public class UserFragment extends Fragment {
         userWeight.setText(weight);
 
         TextView userActivity = view.findViewById(R.id.user_activity);
-        String activity;
-        switch (String.valueOf(userSettings.getActivity())) {
-            case "1.375":
-                activity = "Lightly active";
-                break;
-            case "1.55":
-                activity = "Moderately active";
-                break;
-            case "1.725":
-                activity = "Very active";
-                break;
-            case "1.9":
-                activity = "Extremely active";
-                break;
-            default:
-                activity = "Sedentary";
-        }
+        String activity = switch (String.valueOf(userSettings.getActivity())) {
+            case "1.375" -> "Lightly active";
+            case "1.55" -> "Moderately active";
+            case "1.725" -> "Very active";
+            case "1.9" -> "Extremely active";
+            default -> "Sedentary";
+        };
         userActivity.setText(activity);
 
         TextView userProtein = view.findViewById(R.id.goal_protein);

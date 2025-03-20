@@ -1,23 +1,11 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
-    id 'com.android.application' version '7.3.0' apply false
-    id 'com.android.library' version '7.3.0' apply false
-    id 'com.github.triplet.play' version '3.7.0' apply false
-    id "org.sonarqube" version "2.7"
+    alias(libs.plugins.android.application) apply false
+    id 'io.franzbecker.gradle-lombok' version '5.0.0'
 }
 
-sonarqube {
-    properties {
-        property "sonar.projectKey", 'slt-programmers_macrologAndroid'
-    }
-}
-
-task clean(type: Delete) {
-    delete rootProject.buildDir
-}
-
-task build()
-
-task lintDebug()
-
-task publishBundle()
+//sonarqube {
+//    properties {
+//        property "sonar.projectKey", 'slt-programmers_macrologAndroid'
+//    }
+//}

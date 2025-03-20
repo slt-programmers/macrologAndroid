@@ -51,7 +51,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
-import io.reactivex.disposables.Disposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 
 public class EditEntryActivity extends AppCompatActivity {
 

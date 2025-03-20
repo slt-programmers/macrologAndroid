@@ -9,13 +9,11 @@ import com.csl.macrologandroid.util.DateParser;
 import java.util.Date;
 import java.util.List;
 
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
+import io.reactivex.rxjava3.core.Observable;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
@@ -41,7 +39,7 @@ public class EntryService {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BuildConfig.SERVER_URL)
                 .client(client.build())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
 
@@ -49,11 +47,11 @@ public class EntryService {
     }
 
     public Observable<List<LogEntryResponse>> getLogsForDay(Date date) {
-        return apiService.getLogsForDay(DateParser.format(date)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        return apiService.getLogsForDay(DateParser.format(date));
     }
 
     public Observable<List<LogEntryResponse>> postEntries(List<EntryDto> entries, Date date, Meal meal) {
-        return apiService.postEntries(entries, DateParser.format(date), meal).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        return apiService.postEntries(entries, DateParser.format(date), meal);
     }
 
     private interface ApiService {

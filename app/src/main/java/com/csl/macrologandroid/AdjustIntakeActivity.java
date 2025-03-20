@@ -23,9 +23,10 @@ import com.csl.macrologandroid.services.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-import io.reactivex.Observable;
-import io.reactivex.disposables.Disposable;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.disposables.Disposable;
 import okhttp3.ResponseBody;
 
 public class AdjustIntakeActivity extends AppCompatActivity {
@@ -65,7 +66,7 @@ public class AdjustIntakeActivity extends AppCompatActivity {
                         userSettings = res;
                         setupButtons();
                     },
-                    err -> Log.e(this.getLocalClassName(), err.getMessage())
+                    err -> Log.e(this.getLocalClassName(), Objects.requireNonNull(err.getMessage()))
             );
         } else {
             setupButtons();
@@ -154,7 +155,7 @@ public class AdjustIntakeActivity extends AppCompatActivity {
                             resultIntent.putExtra("RELOAD", true);
                             setResult(Activity.RESULT_OK, resultIntent);
                             finish();
-                        }, err -> Log.e(this.getLocalClassName(), err.getMessage()));
+                        }, err -> Log.e(this.getLocalClassName(), Objects.requireNonNull(err.getMessage())));
 
             }
         }

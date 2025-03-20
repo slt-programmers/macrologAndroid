@@ -16,20 +16,20 @@
         <item name="android:spinnerItemStyle">@style/spinnerItemStyle</item>
     </style>
 
-    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
-        <!-- Set the splash screen background, animated icon, and animation duration. -->
-        <item name="windowSplashScreenBackground">@color/darkblue</item>
+<!--    <style name="Theme.App.Starting" parent="Theme.SplashScreen">-->
+<!--        &lt;!&ndash; Set the splash screen background, animated icon, and animation duration. &ndash;&gt;-->
+<!--        <item name="windowSplashScreenBackground">@color/darkblue</item>-->
 
-        <!-- Use windowSplashScreenAnimatedIcon to add either a drawable or an
-             animated drawable. One of these is required. -->
-        <item name="windowSplashScreenAnimatedIcon">@drawable/app_icon_foreground</item>
-        <!-- Required for animated icons -->
-        <item name="windowSplashScreenAnimationDuration">200</item>
+<!--        &lt;!&ndash; Use windowSplashScreenAnimatedIcon to add either a drawable or an-->
+<!--             animated drawable. One of these is required. &ndash;&gt;-->
+<!--        <item name="windowSplashScreenAnimatedIcon">@drawable/app_icon_foreground</item>-->
+<!--        &lt;!&ndash; Required for animated icons &ndash;&gt;-->
+<!--        <item name="windowSplashScreenAnimationDuration">200</item>-->
 
-        <!-- Set the theme of the Activity that directly follows your splash screen. -->
-        <!-- Required -->
-        <item name="postSplashScreenTheme">@style/AppTheme</item>
-    </style>
+<!--        &lt;!&ndash; Set the theme of the Activity that directly follows your splash screen. &ndash;&gt;-->
+<!--        &lt;!&ndash; Required &ndash;&gt;-->
+<!--        <item name="postSplashScreenTheme">@style/AppTheme</item>-->
+<!--    </style>-->
 
     <style name="bottomNavigationView" parent="Widget.Design.BottomNavigationView">
         <item name="android:textSize">12sp</item>

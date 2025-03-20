@@ -1,19 +1,20 @@
 package com.csl.macrologandroid.services;
 
-import com.csl.macrologandroid.BuildConfig;
+import static com.csl.macrologandroid.BuildConfig.SERVER_URL;
+
 import com.csl.macrologandroid.dtos.ConnectivityRequest;
 import com.csl.macrologandroid.dtos.ConnectivityResponse;
 import com.csl.macrologandroid.dtos.SettingsResponse;
 import com.csl.macrologandroid.dtos.UserSettingsResponse;
 
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
+
+import io.reactivex.rxjava3.core.Observable;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+
+import okhttp3.ResponseBody;
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
@@ -37,9 +38,9 @@ public class UserService {
         });
 
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BuildConfig.SERVER_URL)
+                .baseUrl(SERVER_URL)
                 .client(client.build())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .addConverterFactory(CustomGsonConverter.create())
                 .build();
 
@@ -48,23 +49,23 @@ public class UserService {
 
     // Gets current weight from weight repository
     public Observable<UserSettingsResponse> getUserSettings() {
-        return apiService.getUserSettings().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        return apiService.getUserSettings();
     }
 
     public Observable<ResponseBody> putSetting(SettingsResponse setting) {
-        return apiService.putSetting(setting).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        return apiService.putSetting(setting);
     }
 
     public Observable<ConnectivityResponse> getConnectivitySetting(String key) {
-        return apiService.getConnectivitySetting(key).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        return apiService.getConnectivitySetting(key);
     }
 
     public Observable<ConnectivityResponse> postConnectivitySetting(String platform, ConnectivityRequest request) {
-        return apiService.postConnectivitySetting(platform, request).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        return apiService.postConnectivitySetting(platform, request);
     }
 
     public Observable<ResponseBody> deleteConnectivitySetting(String platform) {
-        return apiService.deleteConnectivitySetting(platform).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread());
+        return apiService.deleteConnectivitySetting(platform);
     }
 
     private interface ApiService {
