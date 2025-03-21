@@ -22,6 +22,7 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.csl.macrologandroid.EditEntryActivity;
 import com.csl.macrologandroid.R;
 import com.csl.macrologandroid.databinding.FragmentDiaryBinding;
 import com.csl.macrologandroid.dtos.LogEntryResponse;
@@ -38,10 +39,12 @@ import java.util.Locale;
 public class DiaryFragment extends Fragment {
 
     private DiaryViewModel diaryViewModel;
-    private FragmentDiaryBinding binding;
     private View root;
     private TextView diaryDate;
-    private ConstraintLayout logEntriesLayout;
+    private LinearLayout breakfastLayout;
+    private LinearLayout lunchLayout;
+    private LinearLayout dinnerLayout;
+    private LinearLayout snacksLayout;
     private int goalProtein;
     private int goalFat;
     private int goalCarbs;
@@ -49,11 +52,12 @@ public class DiaryFragment extends Fragment {
 
     private SimpleDateFormat simpleDateFormat;
 
+    private List<LogEntryResponse> logEntries;
+
     private final ActivityResultLauncher<Intent> editEntriesForResult = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
-//                    logEntryCache.removeFromCache(selectedDate);
                 }
             });
 
@@ -72,24 +76,29 @@ public class DiaryFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         diaryViewModel = new ViewModelProvider(this).get(DiaryViewModel.class);
-        binding = FragmentDiaryBinding.inflate(inflater, container, false);
+        final var binding = FragmentDiaryBinding.inflate(inflater, container, false);
         root = binding.getRoot();
 
-        final var layout = (ViewGroup) inflater.inflate(R.layout.layout_diary_page, container, false);
-        logEntriesLayout = root.findViewById(R.id.diary_entries_layout);
-        logEntriesLayout.addView(layout);
+        createDateSelectView();
 
-        final var arrowLeft = (ImageView) root.findViewById(R.id.arrow_left);
-        final var arrowRight = (ImageView) root.findViewById(R.id.arrow_right);
-        arrowLeft.setOnClickListener(args -> {
-            diaryViewModel.loadPreviousLogEntries();
-            setDateText();
-        });
-        arrowRight.setOnClickListener(args -> {
-            diaryViewModel.loadNextLogEntries();
-            setDateText();
-        });
-        setupDateSelect();
+        final var logEntriesLayout = root.findViewById(R.id.diary_entries_layout);
+        final var breakfastCard = logEntriesLayout.findViewById(R.id.breakfast_card);
+        final var lunchCard = logEntriesLayout.findViewById(R.id.lunch_card);
+        final var dinnerCard = logEntriesLayout.findViewById(R.id.dinner_card);
+        final var snacksCard = logEntriesLayout.findViewById(R.id.snacks_card);
+        ((TextView) breakfastCard.findViewById(R.id.meal_name)).setText(R.string.breakfast);
+        ((TextView) lunchCard.findViewById(R.id.meal_name)).setText(R.string.lunch);
+        ((TextView) dinnerCard.findViewById(R.id.meal_name)).setText(R.string.dinner);
+        ((TextView) snacksCard.findViewById(R.id.meal_name)).setText(R.string.snacks);
+        breakfastCard.findViewById(R.id.edit).setOnClickListener((args) -> startEditMeal(Meal.BREAKFAST));
+        lunchCard.findViewById(R.id.edit).setOnClickListener((args) -> startEditMeal(Meal.LUNCH));
+        dinnerCard.findViewById(R.id.edit).setOnClickListener((args) -> startEditMeal(Meal.DINNER));
+        snacksCard.findViewById(R.id.edit).setOnClickListener((args) -> startEditMeal(Meal.SNACKS));
+        breakfastLayout = breakfastCard.findViewById(R.id.entries_layout);
+        lunchLayout = lunchCard.findViewById(R.id.entries_layout);
+        dinnerLayout = dinnerCard.findViewById(R.id.entries_layout);
+        snacksLayout = snacksCard.findViewById(R.id.entries_layout);
+
         return root;
     }
 
@@ -97,6 +106,8 @@ public class DiaryFragment extends Fragment {
     public void onViewCreated(@NonNull View view, Bundle bundle) {
         diaryViewModel.getMUserSettings().observe(getViewLifecycleOwner(), this::setGoalIntake);
         diaryViewModel.getMLogEntries().observe(getViewLifecycleOwner(), (logEntries) -> {
+            // TODO remove state
+            this.logEntries = logEntries;
             updateTotals(logEntries);
             updateLogEntriesLayout(logEntries);
         });
@@ -108,7 +119,17 @@ public class DiaryFragment extends Fragment {
         super.onDestroy();
     }
 
-    private void setupDateSelect() {
+    private void createDateSelectView() {
+        final var arrowLeft = (ImageView) root.findViewById(R.id.arrow_left);
+        final var arrowRight = (ImageView) root.findViewById(R.id.arrow_right);
+        arrowLeft.setOnClickListener(args -> {
+            diaryViewModel.loadPreviousLogEntries();
+            setDateText();
+        });
+        arrowRight.setOnClickListener(args -> {
+            diaryViewModel.loadNextLogEntries();
+            setDateText();
+        });
         simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
         diaryDate = root.findViewById(R.id.diary_date);
         diaryDate.setOnClickListener(v -> showDateDialog());
@@ -120,10 +141,6 @@ public class DiaryFragment extends Fragment {
     }
 
     private void updateLogEntriesLayout(final List<LogEntryResponse> logEntries) {
-        final var breakfastLayout = (LinearLayout) logEntriesLayout.findViewById(R.id.breakfast_layout);
-        final var lunchLayout = (LinearLayout) logEntriesLayout.findViewById(R.id.lunch_layout);
-        final var dinnerLayout = (LinearLayout) logEntriesLayout.findViewById(R.id.dinner_layout);
-        final var snacksLayout = (LinearLayout) logEntriesLayout.findViewById(R.id.snacks_layout);
         List<LogEntryResponse> breakfastEntries = new ArrayList<>();
         List<LogEntryResponse> lunchEntries = new ArrayList<>();
         List<LogEntryResponse> dinnerEntries = new ArrayList<>();
@@ -164,22 +181,21 @@ public class DiaryFragment extends Fragment {
         }
     }
 
-//    private void startEditMeal(Meal meal) {
-//        Intent intent = new Intent(getActivity(), EditEntryActivity.class);
-//        List<LogEntryResponse> entries = logEntryCache.getFromCache(selectedDate);
-//        List<LogEntryResponse> filteredEntries = new ArrayList<>();
-//        for (LogEntryResponse entry : entries) {
-//            if (entry.getMeal().equals(meal)) {
-//                filteredEntries.add(entry);
-//            }
-//        }
-//        entries = filteredEntries;
-//
-//        intent.putExtra("DATE", selectedDate);
-//        intent.putExtra("MEAL", meal);
-//        intent.putExtra("LOGENTRIES", (Serializable) entries);
-//        editEntriesForResult.launch(intent);
-//    }
+    private void startEditMeal(Meal meal) {
+        Intent intent = new Intent(getActivity(), EditEntryActivity.class);
+        final var filteredEntries = new ArrayList<>();
+        for (LogEntryResponse entry : logEntries) {
+            if (entry.getMeal().equals(meal)) {
+                filteredEntries.add(entry);
+            }
+        }
+
+        intent.putExtra("DATE", diaryViewModel.getSelectedDate());
+        intent.putExtra("MEAL", meal);
+        // TODO niet meer meergeven
+        intent.putExtra("LOGENTRIES", filteredEntries);
+        editEntriesForResult.launch(intent);
+    }
 
 //    private void startEditActivity() {
 //        Intent intent = new Intent(getActivity(), ActivityActivity.class);
