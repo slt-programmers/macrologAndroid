@@ -25,7 +25,6 @@ import com.csl.macrologandroid.EditEntryActivity;
 import com.csl.macrologandroid.R;
 import com.csl.macrologandroid.databinding.FragmentDiaryBinding;
 import com.csl.macrologandroid.dtos.LogEntryResponse;
-import com.csl.macrologandroid.dtos.MacrosResponse;
 import com.csl.macrologandroid.dtos.UserSettingsResponse;
 import com.csl.macrologandroid.fragments.DateDialogFragment;
 import com.csl.macrologandroid.models.Meal;
@@ -146,20 +145,19 @@ public class DiaryFragment extends Fragment {
         fillCard(snacksLayout, diaryViewModel.getSnacksEntries());
     }
 
-    private void fillCard(LinearLayout layout, List<LogEntryResponse> entries) {
-        layout.removeAllViews();
+    private void fillCard(final LinearLayout cardEntriesLayout, final List<LogEntryResponse> entries) {
+        cardEntriesLayout.removeAllViews();
         if (!entries.isEmpty()) {
-            addEntryCardHeader(layout);
+            addEntryCardHeader(cardEntriesLayout);
             for (LogEntryResponse entry : entries) {
-                addEntryToTable(layout, entry);
+                addEntryToTable(cardEntriesLayout, entry);
             }
         } else {
-            TextView hint = new TextView(requireContext());
+            final var hint = new TextView(requireContext());
             hint.setText(R.string.eaten);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             lp.setMargins(0, 8, 0, 8);
-            layout.addView(hint, lp);
+            cardEntriesLayout.addView(hint, lp);
         }
     }
 
@@ -226,7 +224,7 @@ public class DiaryFragment extends Fragment {
         totalCarbsView.setText(String.valueOf(Math.round(diaryViewModel.getTotalCarbs() * 10) / 10f));
         final var totalCaloriesView = (TextView) root.findViewById(R.id.total_calories);
         totalCaloriesView.setText(String.format(Locale.getDefault(), "%d/%d", diaryViewModel.getTotalCalories(), goalCalories));
-        
+
         setProgress();
     }
 
@@ -282,99 +280,19 @@ public class DiaryFragment extends Fragment {
 //        dialog.show(requireActivity().getSupportFragmentManager(), "WeighDialogFragment");
     }
 
-    private void addEntryCardHeader(LinearLayout layout) {
-        // TODO component van maken
-        final var context = requireContext();
-        LinearLayout header = new LinearLayout(context);
-        header.setOrientation(LinearLayout.HORIZONTAL);
-
-        TextView dummy = new TextView(requireContext());
-        dummy.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, 1f));
-
-        TextView p = new TextView(context);
-        p.setText(R.string.p);
-        p.setTypeface(null, Typeface.BOLD);
-        p.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-
-        TextView f = new TextView(context);
-        f.setText(R.string.f);
-        f.setTypeface(null, Typeface.BOLD);
-        f.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-
-        TextView c = new TextView(context);
-        c.setText(R.string.c);
-        c.setTypeface(null, Typeface.BOLD);
-        c.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-
-        TextView kcal = new TextView(context);
-        kcal.setText(R.string.kcal);
-        kcal.setTypeface(null, Typeface.BOLD);
-        kcal.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_END);
-
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(100, ViewGroup.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(0, 8, 0, 8);
-        header.addView(dummy);
-        header.addView(p, lp);
-        header.addView(f, lp);
-        header.addView(c, lp);
-        header.addView(kcal, lp);
-
+    private void addEntryCardHeader(final LinearLayout layout) {
+        final var header = getLayoutInflater().inflate(R.layout.layout_entry_card_header, null);
         layout.addView(header);
     }
 
-    private void addEntryToTable(LinearLayout layout, LogEntryResponse entry) {
-        final var context = requireContext();
-        LinearLayout row = new LinearLayout(context);
-        row.setOrientation(LinearLayout.HORIZONTAL);
-
-        TextView name = getCustomizedTextView(new TextView(context));
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT, 1f);
-        name.setText(entry.getFood().getName());
-        name.setLayoutParams(lp);
-
-        TextView protein = getCustomizedMacroTextView(entry.getMacrosCalculated().getProtein());
-        TextView fat = getCustomizedMacroTextView(entry.getMacrosCalculated().getFat());
-        TextView carbs = getCustomizedMacroTextView(entry.getMacrosCalculated().getCarbs());
-        TextView kcal = getCustomizedCalorieTextView(entry.getMacrosCalculated().getCalories());
-
-        row.addView(name);
-        row.addView(protein);
-        row.addView(fat);
-        row.addView(carbs);
-        row.addView(kcal);
-
+    private void addEntryToTable(final LinearLayout layout, final LogEntryResponse entry) {
+        final var row = getLayoutInflater().inflate(R.layout.layout_entry_card_row, null);
+        ((TextView) row.findViewById(R.id.food_name)).setText(entry.getFood().getName());
+        ((TextView) row.findViewById(R.id.food_protein)).setText(String.format(Locale.ENGLISH,"%.1f", entry.getMacrosCalculated().getProtein()));
+        ((TextView) row.findViewById(R.id.food_fat)).setText(String.format(Locale.ENGLISH,"%.1f", entry.getMacrosCalculated().getFat()));
+        ((TextView) row.findViewById(R.id.food_carbs)).setText(String.format(Locale.ENGLISH,"%.1f",entry.getMacrosCalculated().getCarbs()));
+        ((TextView) row.findViewById(R.id.food_kcal)).setText(String.format(Locale.ENGLISH,"%1.0f",entry.getMacrosCalculated().getCalories()));
         layout.addView(row);
     }
 
-    private TextView getCustomizedTextView(TextView view) {
-        final var context = requireContext();
-        view.setTextSize(16);
-        Typeface typeface = ResourcesCompat.getFont(context, R.font.assistant_light);
-        view.setTypeface(typeface);
-        return view;
-    }
-
-    private TextView getCustomizedCalorieTextView(double text) {
-        final var context = requireContext();
-        TextView view = new TextView(context);
-        view.setText(String.format(Locale.ENGLISH, "%1.0f", text));
-        setTextViewLayout(view);
-        return getCustomizedTextView(view);
-    }
-
-    private TextView getCustomizedMacroTextView(double text) {
-        final var context = requireContext();
-        TextView view = new TextView(context);
-        view.setText(String.format(Locale.ENGLISH, "%.1f", text));
-        setTextViewLayout(view);
-        return getCustomizedTextView(view);
-    }
-
-    private void setTextViewLayout(TextView view) {
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(100, ViewGroup.LayoutParams.WRAP_CONTENT);
-        lp.setMargins(0, 8, 0, 8);
-        view.setLayoutParams(lp);
-        view.setGravity(Gravity.END);
-    }
 }
