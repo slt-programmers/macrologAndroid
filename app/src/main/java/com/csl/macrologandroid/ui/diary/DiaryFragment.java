@@ -15,6 +15,7 @@ import android.widget.TextView;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -80,7 +81,8 @@ public class DiaryFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, Bundle bundle) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
         diaryViewModel.getMUserSettings().observe(getViewLifecycleOwner(), this::setGoalIntake);
         diaryViewModel.getMLogEntries().observe(getViewLifecycleOwner(), (logEntries) -> {
             updateTotals();

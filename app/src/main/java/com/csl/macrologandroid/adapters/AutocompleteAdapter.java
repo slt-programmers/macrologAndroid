@@ -50,9 +50,7 @@ public class AutocompleteAdapter extends ArrayAdapter<String> {
     @NonNull
     @Override
     public Filter getFilter() {
-
         return new Filter() {
-
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
                 FilterResults results = new FilterResults();

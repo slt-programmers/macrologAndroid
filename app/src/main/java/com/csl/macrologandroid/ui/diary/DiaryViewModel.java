@@ -117,7 +117,6 @@ public class DiaryViewModel extends ViewModel {
         }
     }
 
-
     private void sortEntriesAndSetTotals(final List<LogEntryResponse> logEntries) {
         resetAllState();
         for (LogEntryResponse logEntry : logEntries) {
