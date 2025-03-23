@@ -55,7 +55,7 @@ public class EditDiaryFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        viewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(EditDiaryViewModel.initializer)).get(EditDiaryViewModel.class);
+        viewModel = new ViewModelProvider(this).get(EditDiaryViewModel.class);
         binding = FragmentEditDiaryBinding.inflate(inflater, container, false);
         root = binding.getRoot();
         procesFragmentArguments();

@@ -1,16 +1,15 @@
 package com.csl.macrologandroid.ui.diary;
 
-import static androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY;
-
+import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
-import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
 import com.csl.macrologandroid.cache.DiaryLogCache;
 import com.csl.macrologandroid.cache.UserSettingsCache;
+import com.csl.macrologandroid.data.repositories.LogEntryRepository;
 import com.csl.macrologandroid.dtos.ActivityResponse;
 import com.csl.macrologandroid.dtos.LogEntryResponse;
 import com.csl.macrologandroid.dtos.MacrosResponse;
@@ -30,9 +29,10 @@ import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 
 import lombok.Getter;
 
-public class DiaryViewModel extends ViewModel {
+public class DiaryViewModel extends AndroidViewModel {
 
     private final UserService userService;
+    private final LogEntryRepository logEntryRepository;
     private final EntryService entryService;
     private final ActivityService activityService;
 
@@ -65,18 +65,11 @@ public class DiaryViewModel extends ViewModel {
 
     private final List<Disposable> disposables = new ArrayList<>();
 
-    static final ViewModelInitializer<DiaryViewModel> initializer = new ViewModelInitializer<>(
-            DiaryViewModel.class,
-            creationExtras -> {
-                final var app = creationExtras.get(APPLICATION_KEY);
-                assert app != null;
-                return new DiaryViewModel(app.getApplicationContext());
-            }
-    );
-
-    public DiaryViewModel(final Context context) {
-        final var token = context.getSharedPreferences("AUTH", Context.MODE_PRIVATE).getString("TOKEN", null);
+    public DiaryViewModel(final Application application) {
+        super(application);
+        final var token = application.getApplicationContext().getSharedPreferences("AUTH", Context.MODE_PRIVATE).getString("TOKEN", null);
         this.userService = new UserService(token);
+        this.logEntryRepository = new LogEntryRepository(application);
         this.entryService = new EntryService(token);
         this.activityService = new ActivityService(token);
         mUserSettings = new MutableLiveData<>();

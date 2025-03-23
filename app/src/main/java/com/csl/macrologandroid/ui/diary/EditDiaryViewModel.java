@@ -2,9 +2,11 @@ package com.csl.macrologandroid.ui.diary;
 
 import static androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY;
 
+import android.app.Application;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.viewmodel.ViewModelInitializer;
@@ -33,7 +35,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 import lombok.Getter;
 import lombok.Setter;
 
-public class EditDiaryViewModel extends ViewModel {
+public class EditDiaryViewModel extends AndroidViewModel {
 
     private final List<Disposable> disposables = new ArrayList<>();
     private final FoodService foodService;
@@ -55,16 +57,9 @@ public class EditDiaryViewModel extends ViewModel {
     private List<FoodResponse> allFood;
     private List<DishResponse> allDishes;
 
-    static final ViewModelInitializer<EditDiaryViewModel> initializer = new ViewModelInitializer<>(
-            EditDiaryViewModel.class,
-            creationExtras -> {
-                final var app = creationExtras.get(APPLICATION_KEY);
-                assert app != null;
-                return new EditDiaryViewModel(app.getApplicationContext());
-            }
-    );
-    public EditDiaryViewModel(final Context context) {
-        final var token = context.getSharedPreferences("AUTH", Context.MODE_PRIVATE).getString("TOKEN", null);
+    public EditDiaryViewModel(final Application app) {
+        super(app);
+        final var token = app.getApplicationContext().getSharedPreferences("AUTH", Context.MODE_PRIVATE).getString("TOKEN", null);
         foodService = new FoodService(token);
         dishService = new DishService(token);
         entryService = new EntryService(token);

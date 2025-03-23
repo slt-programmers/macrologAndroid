@@ -46,15 +46,11 @@ public class DiaryFragment extends Fragment {
 
     private SimpleDateFormat simpleDateFormat;
 
-    public DiaryFragment() {
-        // Non arg constructor
-    }
-
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final var binding = FragmentDiaryBinding.inflate(inflater, container, false);
         root = binding.getRoot();
-        diaryViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(DiaryViewModel.initializer)).get(DiaryViewModel.class);
+        diaryViewModel = new ViewModelProvider(this).get(DiaryViewModel.class);
 
         createDateSelectView();
 
@@ -111,7 +107,7 @@ public class DiaryFragment extends Fragment {
             diaryViewModel.loadNextDate();
             setDateText();
         });
-        simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.ENGLISH);
         diaryDate = root.findViewById(R.id.diary_date);
         setDateText();
     }

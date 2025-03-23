@@ -1,4 +1,4 @@
-package com.csl.macrologandroid.repository;
+package com.csl.macrologandroid.data.repositories;
 
 import android.content.Context;
 import android.content.SharedPreferences;
