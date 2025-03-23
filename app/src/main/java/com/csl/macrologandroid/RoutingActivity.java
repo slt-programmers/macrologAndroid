@@ -26,10 +26,7 @@ public class RoutingActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-//        SplashScreen splashScreen = SplashScreen.installSplashScreen(this);
         super.onCreate(savedInstanceState);
-//        splashScreen.setKeepOnScreenCondition(() -> true );
-
         service = new HealthcheckService();
         token = getSharedPreferences("AUTH", MODE_PRIVATE).getString("TOKEN", null);
 

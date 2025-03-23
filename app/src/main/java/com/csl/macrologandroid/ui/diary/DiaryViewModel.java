@@ -1,9 +1,13 @@
 package com.csl.macrologandroid.ui.diary;
 
+import static androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY;
+
+import android.content.Context;
 import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
 import com.csl.macrologandroid.cache.DiaryLogCache;
 import com.csl.macrologandroid.cache.UserSettingsCache;
@@ -61,9 +65,17 @@ public class DiaryViewModel extends ViewModel {
 
     private final List<Disposable> disposables = new ArrayList<>();
 
-    public DiaryViewModel() {
-        // TODO improve initialization of services
-        final var token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2Vycy9Uek1Vb2NNRjRwIiwiZXhwIjoxNzQzMjUwNjg1LCJuYW1lIjoiQ2FybWVuU2Nob2x0ZSIsInVzZXJJZCI6Mn0.9J1kJ6f9e2B-9mpth38PZc6IuPqAs2ylWy-jykmAS5w";
+    static final ViewModelInitializer<DiaryViewModel> initializer = new ViewModelInitializer<>(
+            DiaryViewModel.class,
+            creationExtras -> {
+                final var app = creationExtras.get(APPLICATION_KEY);
+                assert app != null;
+                return new DiaryViewModel(app.getApplicationContext());
+            }
+    );
+
+    public DiaryViewModel(final Context context) {
+        final var token = context.getSharedPreferences("AUTH", Context.MODE_PRIVATE).getString("TOKEN", null);
         this.userService = new UserService(token);
         this.entryService = new EntryService(token);
         this.activityService = new ActivityService(token);

@@ -150,4 +150,8 @@
     <string name="error_email_not_found">Email not found</string>
     <string name="error_general">Something went wrong. Try again later.</string>
     <string name="add_food">Add food</string>
+
+<!--    preferences-->
+    <string name="auth">AUTH</string>
+    <string name="prefered_portion">PREF_PORTION</string>
 </resources>

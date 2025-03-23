@@ -51,15 +51,10 @@ public class DiaryFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-    }
-
-    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        diaryViewModel = new ViewModelProvider(this).get(DiaryViewModel.class);
         final var binding = FragmentDiaryBinding.inflate(inflater, container, false);
         root = binding.getRoot();
+        diaryViewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(DiaryViewModel.initializer)).get(DiaryViewModel.class);
 
         createDateSelectView();
 
@@ -83,8 +78,8 @@ public class DiaryFragment extends Fragment {
         activitiesLayout = logEntriesLayout.findViewById(R.id.activities_layout);
         logEntriesLayout.findViewById(R.id.sync_activities).setOnClickListener(v ->
                 diaryViewModel.syncActivities());
-        logEntriesLayout.findViewById(R.id.edit_activity).setOnClickListener(v ->
-                startEditActivity());
+//        logEntriesLayout.findViewById(R.id.edit_activity).setOnClickListener(v ->
+//                startEditActivity());
         return root;
     }
 

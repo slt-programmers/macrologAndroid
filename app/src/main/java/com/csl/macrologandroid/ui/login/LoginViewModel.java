@@ -1,6 +1,8 @@
 package com.csl.macrologandroid.ui.login;
 
+
 import android.content.SharedPreferences;
+
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
@@ -45,7 +47,7 @@ public class LoginViewModel extends ViewModel {
                 .putString("USER", result.getName())
                 .putString("TOKEN", result.getToken())
                 .apply();
-    } 
+    }
 
     private String getToken() {
         return this.sharedPreferences.getString("TOKEN", "");

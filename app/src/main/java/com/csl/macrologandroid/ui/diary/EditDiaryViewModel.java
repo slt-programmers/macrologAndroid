@@ -1,9 +1,13 @@
 package com.csl.macrologandroid.ui.diary;
 
+import static androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.APPLICATION_KEY;
+
+import android.content.Context;
 import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.viewmodel.ViewModelInitializer;
 
 import com.csl.macrologandroid.cache.DiaryLogCache;
 import com.csl.macrologandroid.cache.DishCache;
@@ -11,7 +15,7 @@ import com.csl.macrologandroid.cache.FoodCache;
 import com.csl.macrologandroid.dtos.DishResponse;
 import com.csl.macrologandroid.dtos.FoodResponse;
 import com.csl.macrologandroid.dtos.LogEntryResponse;
-import com.csl.macrologandroid.dtos.PortionResponse;
+import com.csl.macrologandroid.mappers.IngredientResponseToLogEntryResponseMapper;
 import com.csl.macrologandroid.mappers.LogEntryResponseToEntryDtoMapper;
 import com.csl.macrologandroid.models.Meal;
 import com.csl.macrologandroid.services.DishService;
@@ -51,9 +55,16 @@ public class EditDiaryViewModel extends ViewModel {
     private List<FoodResponse> allFood;
     private List<DishResponse> allDishes;
 
-    public EditDiaryViewModel() {
-        // TODO refactor
-        final var token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2Vycy9Uek1Vb2NNRjRwIiwiZXhwIjoxNzQzMjUwNjg1LCJuYW1lIjoiQ2FybWVuU2Nob2x0ZSIsInVzZXJJZCI6Mn0.9J1kJ6f9e2B-9mpth38PZc6IuPqAs2ylWy-jykmAS5w";
+    static final ViewModelInitializer<EditDiaryViewModel> initializer = new ViewModelInitializer<>(
+            EditDiaryViewModel.class,
+            creationExtras -> {
+                final var app = creationExtras.get(APPLICATION_KEY);
+                assert app != null;
+                return new EditDiaryViewModel(app.getApplicationContext());
+            }
+    );
+    public EditDiaryViewModel(final Context context) {
+        final var token = context.getSharedPreferences("AUTH", Context.MODE_PRIVATE).getString("TOKEN", null);
         foodService = new FoodService(token);
         dishService = new DishService(token);
         entryService = new EntryService(token);
@@ -65,6 +76,18 @@ public class EditDiaryViewModel extends ViewModel {
 
     public void initLogEntries() {
         getLogEntries();
+    }
+
+    public void addDishToLogEntries(final String dishName) {
+        final var dish = allDishes.stream().filter(d -> dishName.equals(d.getName())).findFirst().orElse(null);
+        if (dish != null) {
+            final var logEntriesFromIngredients = dish.getIngredients().stream()
+                    .map(i -> IngredientResponseToLogEntryResponseMapper.map(i, selectedDate, selectedMeal))
+                    .toList();
+            final var logEntries = new ArrayList<>(mLogEntries.getValue());
+            logEntries.addAll(logEntriesFromIngredients);
+            mLogEntries.setValue(logEntries);
+        }
     }
 
     public void setSelectedFood(final String foodName) {
@@ -100,7 +123,7 @@ public class EditDiaryViewModel extends ViewModel {
         entry.setDay(selectedDate);
         entry.setMeal(selectedMeal);
 
-        final var logEntries =new ArrayList<>(mLogEntries.getValue());
+        final var logEntries = new ArrayList<>(mLogEntries.getValue());
         logEntries.add(entry);
         mLogEntries.setValue(logEntries);
     }
@@ -117,11 +140,8 @@ public class EditDiaryViewModel extends ViewModel {
             final var logEntryDtos = mLogEntries.getValue().stream().map(LogEntryResponseToEntryDtoMapper::map).toList();
             disposables.add(entryService.postEntries(logEntryDtos, selectedDate, selectedMeal)
                     .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(res -> {
-                        callback.run();
-                    }, err -> {
-                        Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage()));
-                    })
+                    .subscribe(res -> callback.run(),
+                            err -> Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage())))
             );
         }
     }
@@ -146,19 +166,7 @@ public class EditDiaryViewModel extends ViewModel {
             disposables.add(foodService.getAllFood().observeOn(AndroidSchedulers.mainThread()).subscribe(res -> {
                 allFood = res;
                 combineFoodAndDishesSearchList();
-            }, err -> {
-                Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage()));
-
-                //TODO verwijder
-
-                allDishes = List.of();
-                allFood = List.of(new FoodResponse(1L, "Appel", 1, 2, 3, List.of(
-                        new PortionResponse(1L, 160, "stuk")
-                )));
-                combineFoodAndDishesSearchList();
-
-                //
-            }));
+            }, err -> Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage()))));
         }
     }
 

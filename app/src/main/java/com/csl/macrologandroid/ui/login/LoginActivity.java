@@ -27,6 +27,7 @@ import com.csl.macrologandroid.lifecycle.Session;
 import com.csl.macrologandroid.util.ResetErrorTextWatcher;
 
 import java.net.ConnectException;
+import java.util.Objects;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -63,7 +64,7 @@ public class LoginActivity extends AppCompatActivity {
                 setResult(Activity.RESULT_OK, intent);
                 finish();
             } else {
-                Log.e(this.getLocalClassName(), loginResult.getError().getMessage());
+                Log.e(this.getLocalClassName(), Objects.requireNonNull(loginResult.getError().getMessage()));
                 if (loginResult.getError() instanceof ConnectException) {
                     passwordError.setText(R.string.connection_error);
                 } else {
@@ -116,11 +117,6 @@ public class LoginActivity extends AppCompatActivity {
     public void onPause() {
         super.onPause();
         Session.resetTimestamp();
-    }
-
-    @Override
-    public void onBackPressed() {
-        // Do nothing
     }
 
     @Override

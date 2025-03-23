@@ -13,7 +13,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -56,7 +55,7 @@ public class EditDiaryFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        viewModel = new ViewModelProvider(this).get(EditDiaryViewModel.class);
+        viewModel = new ViewModelProvider(this, ViewModelProvider.Factory.from(EditDiaryViewModel.initializer)).get(EditDiaryViewModel.class);
         binding = FragmentEditDiaryBinding.inflate(inflater, container, false);
         root = binding.getRoot();
         procesFragmentArguments();
@@ -115,14 +114,19 @@ public class EditDiaryFragment extends Fragment {
 
     private void autocompleteItemClicked(final View view) {
         final var foodName = ((AppCompatCheckedTextView) view).getText().toString();
-//            if (isDish(foodName)) {
-//                foodTextView.setText("");
-//                addDishEntry(foodName);
-//            } else {
-        setupPortionUnitSpinner(((AppCompatCheckedTextView) view).getText().toString());
-        toggleFields(true);
-//            }
+        if (isDish(foodName)) {
+            autocompleteTextView.setText("");
+            addDishEntry(foodName);
+        } else {
+            setupPortionUnitSpinner(((AppCompatCheckedTextView) view).getText().toString());
+            toggleFields(true);
+        }
 //            addNewFoodButton.setVisibility(View.INVISIBLE);
+    }
+
+    private void addDishEntry(final String dishName) {
+        final var dishNameTrimmed = dishName.substring(0, dishName.length() - 7);
+        viewModel.addDishToLogEntries(dishNameTrimmed);
     }
 
     private void setupPortionUnitSpinner(final String foodName) {
@@ -255,7 +259,11 @@ public class EditDiaryFragment extends Fragment {
         });
     }
 
-    public boolean isNumeric(String strNum) {
+    private boolean isDish(final String name) {
+        return name != null && name.endsWith(" (Dish)");
+    }
+
+    public boolean isNumeric(final String strNum) {
         if (strNum == null || strNum.isEmpty()) {
             return false;
         }
@@ -266,4 +274,5 @@ public class EditDiaryFragment extends Fragment {
         }
         return true;
     }
+
 }
