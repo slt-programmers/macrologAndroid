@@ -1,6 +1,5 @@
 package com.csl.macrologandroid.ui.diary;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,19 +11,18 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.csl.macrologandroid.ActivityActivity;
 import com.csl.macrologandroid.EditEntryActivity;
 import com.csl.macrologandroid.R;
 import com.csl.macrologandroid.databinding.FragmentDiaryBinding;
+import com.csl.macrologandroid.dtos.ActivityResponse;
 import com.csl.macrologandroid.dtos.LogEntryResponse;
 import com.csl.macrologandroid.dtos.UserSettingsResponse;
-import com.csl.macrologandroid.fragments.DateDialogFragment;
 import com.csl.macrologandroid.models.Meal;
 
 import java.text.SimpleDateFormat;
@@ -40,6 +38,7 @@ public class DiaryFragment extends Fragment {
     private LinearLayout lunchLayout;
     private LinearLayout dinnerLayout;
     private LinearLayout snacksLayout;
+    private LinearLayout activitiesLayout;
     private int goalProtein;
     private int goalFat;
     private int goalCarbs;
@@ -49,6 +48,11 @@ public class DiaryFragment extends Fragment {
 
     public DiaryFragment() {
         // Non arg constructor
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 
     @Override
@@ -76,7 +80,11 @@ public class DiaryFragment extends Fragment {
         lunchLayout = lunchCard.findViewById(R.id.entries_layout);
         dinnerLayout = dinnerCard.findViewById(R.id.entries_layout);
         snacksLayout = snacksCard.findViewById(R.id.entries_layout);
-
+        activitiesLayout = logEntriesLayout.findViewById(R.id.activities_layout);
+        logEntriesLayout.findViewById(R.id.sync_activities).setOnClickListener(v ->
+                diaryViewModel.syncActivities());
+        logEntriesLayout.findViewById(R.id.edit_activity).setOnClickListener(v ->
+                startEditActivity());
         return root;
     }
 
@@ -88,6 +96,7 @@ public class DiaryFragment extends Fragment {
             updateTotals();
             updateLogEntries();
         });
+        diaryViewModel.getMActivities().observe(getViewLifecycleOwner(), this::updateActivities);
     }
 
     @Override
@@ -100,16 +109,15 @@ public class DiaryFragment extends Fragment {
         final var arrowLeft = (ImageView) root.findViewById(R.id.arrow_left);
         final var arrowRight = (ImageView) root.findViewById(R.id.arrow_right);
         arrowLeft.setOnClickListener(args -> {
-            diaryViewModel.loadPreviousLogEntries();
+            diaryViewModel.loadPreviousDate();
             setDateText();
         });
         arrowRight.setOnClickListener(args -> {
-            diaryViewModel.loadNextLogEntries();
+            diaryViewModel.loadNextDate();
             setDateText();
         });
         simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
         diaryDate = root.findViewById(R.id.diary_date);
-        diaryDate.setOnClickListener(v -> showDateDialog());
         setDateText();
     }
 
@@ -122,6 +130,22 @@ public class DiaryFragment extends Fragment {
         fillCard(lunchLayout, diaryViewModel.getLunchEntries());
         fillCard(dinnerLayout, diaryViewModel.getDinnerEntries());
         fillCard(snacksLayout, diaryViewModel.getSnacksEntries());
+    }
+
+    private void updateActivities(final List<ActivityResponse> activities) {
+        activitiesLayout.removeAllViews();
+        if (!activities.isEmpty()) {
+            addActivityCardHeader(activitiesLayout);
+            for (var activity : activities) {
+                addActivityToTable(activitiesLayout, activity);
+            }
+        } else {
+            final var hint = new TextView(requireContext());
+            hint.setText(R.string.activity_done);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            lp.setMargins(0, 8, 0, 8);
+            activitiesLayout.addView(hint, lp);
+        }
     }
 
     private void fillCard(final LinearLayout cardEntriesLayout, final List<LogEntryResponse> entries) {
@@ -147,13 +171,11 @@ public class DiaryFragment extends Fragment {
         startActivity(intent);
     }
 
-//    private void startEditActivity() {
-//        Intent intent = new Intent(getActivity(), ActivityActivity.class);
-//        List<ActivityResponse> activities = activityCache.getFromCache(selectedDate);
-//        intent.putExtra("DATE", selectedDate);
-//        intent.putExtra("ACTIVITIES", (Serializable) activities);
-//        editActivitiesForResult.launch(intent);
-//    }
+    private void startEditActivity() {
+        final var intent = new Intent(getActivity(), ActivityActivity.class);
+        intent.putExtra("DATE", diaryViewModel.getSelectedDate());
+        startActivity(intent);
+    }
 
     private void setGoalIntake(final UserSettingsResponse settings) {
         goalProtein = settings.getGoalProtein();
@@ -165,23 +187,12 @@ public class DiaryFragment extends Fragment {
         goalCalories = (goalProtein * 4) + (goalFat * 9) + (goalCarbs * 4);
     }
 
-    private void forceSyncActivity() {
-        // TODO move to viewmodel
-//        disposable = activityService.getActivitiesForDay(selectedDate).subscribe(
-//                res -> {
-//                    logEntryCache.clearCache();
-//                    activityCache.clearCache();
-//                },
-//                err -> Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage()))
-//        );
-    }
-
-    private void openLink(String activityId) {
-        Uri intentUri = Uri.parse("https://www.strava.com/activities/")
+    private void openLink(final String activityId) {
+        final var intentUri = Uri.parse("https://www.strava.com/activities/")
                 .buildUpon()
                 .appendPath(activityId)
                 .build();
-        Intent browserIntent = new Intent(Intent.ACTION_VIEW, intentUri);
+        final var browserIntent = new Intent(Intent.ACTION_VIEW, intentUri);
         startActivity(browserIntent);
     }
 
@@ -237,31 +248,36 @@ public class DiaryFragment extends Fragment {
         }
     }
 
-    private void showDateDialog() {
-        DateDialogFragment dialog = new DateDialogFragment();
-        dialog.setCurrentDate(diaryViewModel.getSelectedDate());
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-        // TODO
-//        dialog.setOnDialogResult(date -> {
-//            TextView dateTextView = root.findViewById(R.id.diary_date);
-//            dateTextView.setText(simpleDateFormat.format(date));
-//            selectedDate = date;
-//        });
-//        dialog.show(requireActivity().getSupportFragmentManager(), "WeighDialogFragment");
-    }
-
     private void addEntryCardHeader(final LinearLayout layout) {
         final var header = getLayoutInflater().inflate(R.layout.layout_entry_card_header, null);
+        layout.addView(header);
+    }
+
+    private void addActivityCardHeader(final LinearLayout layout) {
+        final var header = getLayoutInflater().inflate(R.layout.layout_activity_card_header, null);
         layout.addView(header);
     }
 
     private void addEntryToTable(final LinearLayout layout, final LogEntryResponse entry) {
         final var row = getLayoutInflater().inflate(R.layout.layout_entry_card_row, null);
         ((TextView) row.findViewById(R.id.food_name)).setText(entry.getFood().getName());
-        ((TextView) row.findViewById(R.id.food_protein)).setText(String.format(Locale.ENGLISH,"%.1f", entry.getMacrosCalculated().getProtein()));
-        ((TextView) row.findViewById(R.id.food_fat)).setText(String.format(Locale.ENGLISH,"%.1f", entry.getMacrosCalculated().getFat()));
-        ((TextView) row.findViewById(R.id.food_carbs)).setText(String.format(Locale.ENGLISH,"%.1f",entry.getMacrosCalculated().getCarbs()));
-        ((TextView) row.findViewById(R.id.food_kcal)).setText(String.format(Locale.ENGLISH,"%1.0f",entry.getMacrosCalculated().getCalories()));
+        ((TextView) row.findViewById(R.id.food_protein)).setText(String.format(Locale.ENGLISH, "%.1f", entry.getMacrosCalculated().getProtein()));
+        ((TextView) row.findViewById(R.id.food_fat)).setText(String.format(Locale.ENGLISH, "%.1f", entry.getMacrosCalculated().getFat()));
+        ((TextView) row.findViewById(R.id.food_carbs)).setText(String.format(Locale.ENGLISH, "%.1f", entry.getMacrosCalculated().getCarbs()));
+        ((TextView) row.findViewById(R.id.food_kcal)).setText(String.format(Locale.ENGLISH, "%1.0f", entry.getMacrosCalculated().getCalories()));
+        layout.addView(row);
+    }
+
+    private void addActivityToTable(final LinearLayout layout, final ActivityResponse activity) {
+        final var row = getLayoutInflater().inflate(R.layout.layout_activity_card_row, null);
+        ((TextView) row.findViewById(R.id.activity_name)).setText(activity.getName());
+        final var link = row.findViewById(R.id.activity_link);
+        if (activity.getSyncedId() != null) {
+            link.setOnClickListener((v) -> openLink(String.valueOf(activity.getSyncedId())));
+        } else {
+            link.setVisibility(View.INVISIBLE);
+        }
+        ((TextView) row.findViewById(R.id.activity_kcal)).setText(String.valueOf(activity.getCalories()));
         layout.addView(row);
     }
 

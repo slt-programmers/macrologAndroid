@@ -52,6 +52,17 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.70" />
 
+<!--    <EditText-->
+<!--        android:id="@id/food_amount"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginTop="16dp"-->
+<!--        app:layout_constrainedWidth="false"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="@+id/guideline2"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/food_name" />-->
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/food_amount_layout"
         android:layout_width="0dp"

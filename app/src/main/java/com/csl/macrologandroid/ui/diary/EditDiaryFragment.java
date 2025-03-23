@@ -3,7 +3,9 @@ package com.csl.macrologandroid.ui.diary;
 import static android.content.Context.MODE_PRIVATE;
 
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.InputType;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -26,18 +29,13 @@ import androidx.lifecycle.ViewModelProvider;
 import com.csl.macrologandroid.R;
 import com.csl.macrologandroid.adapters.AutocompleteAdapter;
 import com.csl.macrologandroid.databinding.FragmentEditDiaryBinding;
-import com.csl.macrologandroid.dtos.FoodResponse;
 import com.csl.macrologandroid.dtos.LogEntryResponse;
-import com.csl.macrologandroid.dtos.PortionResponse;
 import com.csl.macrologandroid.models.Meal;
 import com.csl.macrologandroid.util.KeyboardManager;
 import com.csl.macrologandroid.util.SpinnerSetupUtil;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -211,6 +209,30 @@ public class EditDiaryFragment extends Fragment {
         } else {
             foodPortion.setSelection(portionList.size() - 1);
         }
+        foodAmount.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                final var amountString = s.toString();
+                if (isNumeric(amountString)) {
+                    final var amount = Double.parseDouble(amountString);
+                    if (logEntry.getPortion() != null) {
+                        logEntry.setMultiplier(amount);
+                    } else {
+                        logEntry.setMultiplier(amount / 100);
+                    }
+                }
+            }
+        });
 
         foodPortion.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -231,5 +253,17 @@ public class EditDiaryFragment extends Fragment {
                 // Not needed
             }
         });
+    }
+
+    public boolean isNumeric(String strNum) {
+        if (strNum == null || strNum.isEmpty()) {
+            return false;
+        }
+        try {
+            Double.parseDouble(strNum);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
     }
 }

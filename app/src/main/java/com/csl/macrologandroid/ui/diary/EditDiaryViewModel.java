@@ -9,7 +9,6 @@ import com.csl.macrologandroid.cache.DiaryLogCache;
 import com.csl.macrologandroid.cache.DishCache;
 import com.csl.macrologandroid.cache.FoodCache;
 import com.csl.macrologandroid.dtos.DishResponse;
-import com.csl.macrologandroid.dtos.EntryDto;
 import com.csl.macrologandroid.dtos.FoodResponse;
 import com.csl.macrologandroid.dtos.LogEntryResponse;
 import com.csl.macrologandroid.dtos.PortionResponse;

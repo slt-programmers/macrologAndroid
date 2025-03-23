@@ -7,10 +7,12 @@ import androidx.lifecycle.ViewModel;
 
 import com.csl.macrologandroid.cache.DiaryLogCache;
 import com.csl.macrologandroid.cache.UserSettingsCache;
+import com.csl.macrologandroid.dtos.ActivityResponse;
 import com.csl.macrologandroid.dtos.LogEntryResponse;
 import com.csl.macrologandroid.dtos.MacrosResponse;
 import com.csl.macrologandroid.dtos.UserSettingsResponse;
 import com.csl.macrologandroid.models.Meal;
+import com.csl.macrologandroid.services.ActivityService;
 import com.csl.macrologandroid.services.EntryService;
 import com.csl.macrologandroid.services.UserService;
 
@@ -28,11 +30,14 @@ public class DiaryViewModel extends ViewModel {
 
     private final UserService userService;
     private final EntryService entryService;
+    private final ActivityService activityService;
 
     @Getter
     private final MutableLiveData<UserSettingsResponse> mUserSettings;
     @Getter
     private final MutableLiveData<List<LogEntryResponse>> mLogEntries;
+    @Getter
+    private final MutableLiveData<List<ActivityResponse>> mActivities;
     @Getter
     private final List<LogEntryResponse> breakfastEntries = new ArrayList<>();
     @Getter
@@ -61,10 +66,13 @@ public class DiaryViewModel extends ViewModel {
         final var token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2Vycy9Uek1Vb2NNRjRwIiwiZXhwIjoxNzQzMjUwNjg1LCJuYW1lIjoiQ2FybWVuU2Nob2x0ZSIsInVzZXJJZCI6Mn0.9J1kJ6f9e2B-9mpth38PZc6IuPqAs2ylWy-jykmAS5w";
         this.userService = new UserService(token);
         this.entryService = new EntryService(token);
+        this.activityService = new ActivityService(token);
         mUserSettings = new MutableLiveData<>();
         mLogEntries = new MutableLiveData<>();
+        mActivities = new MutableLiveData<>();
         initUserSettings();
         getLogEntries(selectedDate);
+        getActivities(selectedDate);
     }
 
     public void disposeAll() {
@@ -75,16 +83,22 @@ public class DiaryViewModel extends ViewModel {
         }
     }
 
-    public void loadNextLogEntries() {
+    public void loadNextDate() {
         final var time = selectedDate.getTime() + (1000 * 60 * 60 * 24);
         selectedDate = new Date(time);
         getLogEntries(selectedDate);
+        getActivities(selectedDate);
     }
 
-    public void loadPreviousLogEntries() {
+    public void loadPreviousDate() {
         final var time = selectedDate.getTime() - (1000 * 60 * 60 * 24);
         selectedDate = new Date(time);
         getLogEntries(selectedDate);
+        getActivities(selectedDate);
+    }
+
+    public void syncActivities() {
+        getActivities(selectedDate);
     }
 
     private void initUserSettings() {
@@ -152,4 +166,9 @@ public class DiaryViewModel extends ViewModel {
         totalCarbs = 0;
     }
 
+    private void getActivities(final Date date) {
+        disposables.add(activityService.getActivitiesForDay(date)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(mActivities::setValue, err -> Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage()))));
+    }
 }
