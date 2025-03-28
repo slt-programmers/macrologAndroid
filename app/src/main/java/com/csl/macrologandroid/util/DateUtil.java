@@ -7,9 +7,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class DateParser {
+public class DateUtil {
 
-    protected DateParser() {
+    protected DateUtil() {
         // No arg constructor
     }
 
@@ -33,7 +33,7 @@ public class DateParser {
                 try {
                     date = shortFormat.parse(string);
                 } catch (ParseException ex2) {
-                    Log.e(DateParser.class.toString(), "Could not parse to Date");
+                    Log.e(DateUtil.class.toString(), "Could not parse to Date");
                 }
             }
         } else {
@@ -43,7 +43,7 @@ public class DateParser {
                 try {
                     date = reversedShortFormat.parse(string);
                 } catch (ParseException ex4) {
-                    Log.e(DateParser.class.toString(), "Could not parse to Date");
+                    Log.e(DateUtil.class.toString(), "Could not parse to Date");
                 }
             }
         }

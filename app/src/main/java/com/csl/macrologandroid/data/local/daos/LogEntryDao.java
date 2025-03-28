@@ -1,18 +1,32 @@
 package com.csl.macrologandroid.data.local.daos;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
+import androidx.room.Delete;
+import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Transaction;
 
 import com.csl.macrologandroid.data.local.entities.LogEntryEntity;
+import com.csl.macrologandroid.data.models.LogEntryData;
 
 import java.util.List;
 
 @Dao
 public interface LogEntryDao {
 
-    @Query("SELECT * FROM logentryentity WHERE day = :date")
+    @Query("SELECT * FROM logentries WHERE day = :date")
     List<LogEntryEntity> getByDate(final String date);
 
+    @Transaction
+    @Query("SELECT * FROM logentries WHERE day = :date")
+    LiveData<List<LogEntryData>> getLogEntriesByDate(final String date);
+
+    @Insert
+    void insertAll(final List<LogEntryEntity> logEntryEntities);
+
+    @Delete
+    void delete(final LogEntryEntity logEntryEntity);
 }
 
 //public interface UserDao {

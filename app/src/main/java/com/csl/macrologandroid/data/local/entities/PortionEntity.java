@@ -11,19 +11,16 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-@Entity(tableName = "logentries")
-public class LogEntryEntity {
+@Entity(tableName = "portions")
+public class PortionEntity {
 
     @PrimaryKey(autoGenerate = true)
-    private int id;
+    private long id;
     @ColumnInfo(name = "external_id")
     private Long externalId;
     @ColumnInfo(name = "food_id")
     private long foodId;
-    @ColumnInfo(name = "portion_id")
-    private long portionId;
-    private Double multiplier;
-    private String day;
-    private String meal;
+    private Double grams;
+    private String description;
 
 }

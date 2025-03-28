@@ -1,36 +1,31 @@
 package com.csl.macrologandroid.services;
 
 import com.csl.macrologandroid.BuildConfig;
-import com.csl.macrologandroid.dtos.EntryDto;
-import com.csl.macrologandroid.dtos.LogEntryResponse;
-import com.csl.macrologandroid.models.Meal;
-import com.csl.macrologandroid.util.DateParser;
+import com.csl.macrologandroid.dtos.FoodDto;
 
-import java.util.Date;
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Observable;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
-import retrofit2.http.Path;
 
-public class EntryService {
+public class FoodClient {
 
     private final ApiService apiService;
 
-    public EntryService(String token) {
+    public FoodClient(String token) {
         OkHttpClient.Builder client = new OkHttpClient.Builder();
         client.addInterceptor(chain -> {
             Request original = chain.request();
             Request request = original.newBuilder()
-                    .addHeader("Authorization", "Bearer " + token)
-                    .addHeader("Content-Type", "application/json")
+                    .header("Authorization", "Bearer " + token)
                     .method(original.method(), original.body())
                     .build();
             return chain.proceed(request);
@@ -46,23 +41,21 @@ public class EntryService {
         apiService = retrofit.create(ApiService.class);
     }
 
-    public Observable<List<LogEntryResponse>> getLogsForDay(Date date) {
-        return apiService.getLogsForDay(DateParser.format(date));
+    public Observable<List<FoodDto>> getAllFood() {
+        return apiService.getAlFood();
     }
 
-    public Observable<List<LogEntryResponse>> postEntries(List<EntryDto> entries, Date date, Meal meal) {
-        return apiService.postEntries(entries, DateParser.format(date), meal);
+    public Observable<ResponseBody> postFood(FoodDto food) {
+        return apiService.postFood(food);
     }
 
     private interface ApiService {
 
-        @GET("logs/day/{date}")
-        Observable<List<LogEntryResponse>> getLogsForDay(@Path("date") String date);
+        @GET("food")
+        Observable<List<FoodDto>> getAlFood();
 
-        @POST("logs/day/{date}/{meal}")
-        Observable<List<LogEntryResponse>> postEntries(@Body List<EntryDto> entries,
-                                                       @Path("date") String date,
-                                                       @Path("meal") Meal meal);
+        @POST("food")
+        Observable<ResponseBody> postFood(@Body FoodDto food);
 
     }
 }

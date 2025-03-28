@@ -19,7 +19,7 @@ import com.csl.macrologandroid.cache.UserSettingsCache;
 import com.csl.macrologandroid.dtos.WeightRequest;
 import com.csl.macrologandroid.fragments.WeighDialogFragment;
 import com.csl.macrologandroid.services.WeightService;
-import com.csl.macrologandroid.util.DateParser;
+import com.csl.macrologandroid.util.DateUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,9 +83,9 @@ public class WeightChartActivity extends AppCompatActivity {
 
     private void sortWeightRequestsByDate() {
         weightRequests.sort((o1, o2) -> {
-            if (DateParser.parse(o1.getDay()).before(DateParser.parse(o2.getDay()))) {
+            if (DateUtil.parse(o1.getDay()).before(DateUtil.parse(o2.getDay()))) {
                 return 1;
-            } else if (DateParser.parse(o1.getDay()).after(DateParser.parse(o2.getDay()))) {
+            } else if (DateUtil.parse(o1.getDay()).after(DateUtil.parse(o2.getDay()))) {
                 return -1;
             } else {
                 return 0;
@@ -128,9 +128,9 @@ public class WeightChartActivity extends AppCompatActivity {
     private double getCurrentWeight() {
         List<WeightRequest> weightList = weightRequests;
         weightList.sort((o1, o2) -> {
-            if (DateParser.parse(o1.getDay()).before(DateParser.parse(o2.getDay()))) {
+            if (DateUtil.parse(o1.getDay()).before(DateUtil.parse(o2.getDay()))) {
                 return 1;
-            } else if (DateParser.parse(o1.getDay()).after(DateParser.parse(o2.getDay()))) {
+            } else if (DateUtil.parse(o1.getDay()).after(DateUtil.parse(o2.getDay()))) {
                 return -1;
             } else {
                 return 0;

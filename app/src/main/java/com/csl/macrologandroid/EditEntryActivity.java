@@ -1,67 +1,38 @@
 package com.csl.macrologandroid;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.database.DataSetObserver;
 import android.os.Bundle;
-import android.text.InputType;
-import android.util.Log;
-import android.view.View;
-import android.view.inputmethod.EditorInfo;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatCheckedTextView;
-import androidx.appcompat.widget.AppCompatTextView;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.csl.macrologandroid.adapters.AutocompleteAdapter;
 import com.csl.macrologandroid.dtos.DishResponse;
-import com.csl.macrologandroid.dtos.FoodResponse;
-import com.csl.macrologandroid.dtos.IngredientResponse;
-import com.csl.macrologandroid.dtos.EntryDto;
+import com.csl.macrologandroid.dtos.FoodDto;
 import com.csl.macrologandroid.dtos.LogEntryResponse;
-import com.csl.macrologandroid.dtos.PortionResponse;
 import com.csl.macrologandroid.lifecycle.Session;
 import com.csl.macrologandroid.models.Meal;
 import com.csl.macrologandroid.services.DishService;
-import com.csl.macrologandroid.services.FoodService;
-import com.csl.macrologandroid.services.EntryService;
+import com.csl.macrologandroid.services.FoodClient;
+import com.csl.macrologandroid.services.LogEntryClient;
 import com.csl.macrologandroid.ui.diary.EditDiaryFragment;
-import com.csl.macrologandroid.util.KeyboardManager;
-import com.csl.macrologandroid.util.SpinnerSetupUtil;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-
-import io.reactivex.rxjava3.disposables.Disposable;
 
 public class EditEntryActivity extends AppCompatActivity {
 
     private Date selectedDate;
-    private EntryService entryService;
-    private FoodService foodService;
+    private LogEntryClient logEntryClient;
+    private FoodClient foodClient;
     private DishService dishService;
 
-    private List<FoodResponse> allFood;
+    private List<FoodDto> allFood;
     private List<DishResponse> allDishes;
 
     private final List<String> autoCompleteList = new ArrayList<>();
@@ -69,7 +40,7 @@ public class EditEntryActivity extends AppCompatActivity {
     private Meal selectedMeal;
 
     private AutoCompleteTextView foodTextView;
-    private FoodResponse selectedFood;
+    private FoodDto selectedFood;
 
     private Spinner editPortionOrUnitSpinner;
     private TextInputEditText editGramsOrAmount;

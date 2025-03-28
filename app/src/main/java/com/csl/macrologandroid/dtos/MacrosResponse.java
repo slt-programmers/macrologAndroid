@@ -2,6 +2,11 @@ package com.csl.macrologandroid.dtos;
 
 import java.io.Serializable;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Setter
+@Getter
 public class MacrosResponse implements Serializable {
 
     private double protein;
@@ -19,35 +24,4 @@ public class MacrosResponse implements Serializable {
         this.calories = calories;
     }
 
-    public double getProtein() {
-        return protein;
-    }
-
-    public double getFat() {
-        return fat;
-    }
-
-    public double getCarbs() {
-        return carbs;
-    }
-
-    public double getCalories() {
-        return calories;
-    }
-
-    public void setProtein(double protein) {
-        this.protein = protein;
-    }
-
-    public void setFat(double fat) {
-        this.fat = fat;
-    }
-
-    public void setCarbs(double carbs) {
-        this.carbs = carbs;
-    }
-
-    public void setCalories(double calories) {
-        this.calories = calories;
-    }
 }

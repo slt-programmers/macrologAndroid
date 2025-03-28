@@ -26,8 +26,8 @@ import androidx.fragment.app.Fragment;
 import com.csl.macrologandroid.AddFoodActivity;
 import com.csl.macrologandroid.R;
 import com.csl.macrologandroid.cache.FoodCache;
-import com.csl.macrologandroid.dtos.FoodResponse;
-import com.csl.macrologandroid.services.FoodService;
+import com.csl.macrologandroid.dtos.FoodDto;
+import com.csl.macrologandroid.services.FoodClient;
 import com.csl.macrologandroid.util.KeyboardManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -46,9 +46,9 @@ import static android.view.KeyEvent.KEYCODE_ENTER;
 
 public class FoodFragment extends Fragment {
 
-    private List<FoodResponse> allFood;
-    private List<FoodResponse> searchedFood;
-    private List<FoodResponse> convertedFood;
+    private List<FoodDto> allFood;
+    private List<FoodDto> searchedFood;
+    private List<FoodDto> convertedFood;
 
     private TableLayout foodTable;
     private TableRow foodTableHeader;
@@ -174,11 +174,11 @@ public class FoodFragment extends Fragment {
         header.setTextColor(getResources().getColor(R.color.darkblue, null));
     }
 
-    private void selectFood(FoodResponse foodResponse) {
+    private void selectFood(FoodDto foodDto) {
         Intent intent = new Intent(getContext(), AddFoodActivity.class);
-        FoodResponse food = null;
-        for (FoodResponse response : allFood) {
-            if (response.getName().equals(foodResponse.getName())) {
+        FoodDto food = null;
+        for (FoodDto response : allFood) {
+            if (response.getName().equals(foodDto.getName())) {
                 food = response;
                 break;
             }
@@ -190,8 +190,8 @@ public class FoodFragment extends Fragment {
 
     private void refreshAllFood() {
         FoodCache.getInstance().clearCache();
-        FoodService foodService = new FoodService(getToken());
-        disposable = foodService.getAllFood()
+        FoodClient foodClient = new FoodClient(getToken());
+        disposable = foodClient.getAllFood()
                 .subscribe(res ->
                 {
                     FoodCache.getInstance().addToCache(res);
@@ -210,11 +210,11 @@ public class FoodFragment extends Fragment {
         }
     }
 
-    private List<FoodResponse> convertGramsToPercentage(List<FoodResponse> foodResponses) {
-        List<FoodResponse> result = new ArrayList<>();
-        for (FoodResponse food : foodResponses) {
+    private List<FoodDto> convertGramsToPercentage(List<FoodDto> foodRespons) {
+        List<FoodDto> result = new ArrayList<>();
+        for (FoodDto food : foodRespons) {
             double total = food.getProtein() + food.getFat() + food.getCarbs();
-            FoodResponse foodPercentage = new FoodResponse(
+            FoodDto foodPercentage = new FoodDto(
                     food.getId(),
                     food.getName(),
                     (food.getProtein() / total * 100),
@@ -227,24 +227,24 @@ public class FoodFragment extends Fragment {
         return result;
     }
 
-    private void fillTable(List<FoodResponse> selection) {
+    private void fillTable(List<FoodDto> selection) {
         foodTable.removeAllViews();
         foodTable.addView(foodTableHeader);
 
-        for (FoodResponse foodResponse : selection) {
+        for (FoodDto foodDto : selection) {
             TableRow row = new TableRow(getContext());
             TextView food = getCustomizedTextView(new TextView(getContext()));
             TableRow.LayoutParams lp = new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT, 8.0f);
 
-            food.setText(foodResponse.getName());
+            food.setText(foodDto.getName());
             food.setLayoutParams(lp);
             food.setClickable(true);
-            food.setOnClickListener(v -> selectFood(foodResponse));
+            food.setOnClickListener(v -> selectFood(foodDto));
 
-            TextView protein = getDecimalNumberTextView(foodResponse.getProtein());
-            TextView fat = getDecimalNumberTextView(foodResponse.getFat());
-            TextView carbs = getDecimalNumberTextView(foodResponse.getCarbs());
+            TextView protein = getDecimalNumberTextView(foodDto.getProtein());
+            TextView fat = getDecimalNumberTextView(foodDto.getFat());
+            TextView carbs = getDecimalNumberTextView(foodDto.getCarbs());
 
             row.addView(food);
             row.addView(protein);
@@ -276,7 +276,7 @@ public class FoodFragment extends Fragment {
                 convertedFood.sort((o1, o2) -> Double.compare(o2.getCarbs(), o1.getCarbs()));
                 break;
             default:
-                convertedFood.sort(Comparator.comparing(FoodResponse::getName));
+                convertedFood.sort(Comparator.comparing(FoodDto::getName));
 
         }
 
@@ -320,7 +320,7 @@ public class FoodFragment extends Fragment {
             if (chars == null || chars.toString().isEmpty()) {
                 searchedFood = allFood;
             } else {
-                for (FoodResponse food : allFood) {
+                for (FoodDto food : allFood) {
                     if (food.getName().toLowerCase().contains(chars.toString().toLowerCase())) {
                         searchedFood.add(food);
                     }

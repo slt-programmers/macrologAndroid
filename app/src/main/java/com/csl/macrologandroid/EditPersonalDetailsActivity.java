@@ -25,7 +25,7 @@ import com.csl.macrologandroid.dtos.UserSettingsResponse;
 import com.csl.macrologandroid.lifecycle.Session;
 import com.csl.macrologandroid.models.Gender;
 import com.csl.macrologandroid.services.UserService;
-import com.csl.macrologandroid.util.DateParser;
+import com.csl.macrologandroid.util.DateUtil;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -107,7 +107,7 @@ public class EditPersonalDetailsActivity extends AppCompatActivity {
             editName.setText(originalName);
 
             originalBirthday = settings.getBirthday();
-            editBirthday.setText(DateParser.format(originalBirthday));
+            editBirthday.setText(DateUtil.format(originalBirthday));
 
             originalGender = settings.getGender();
             if (Gender.FEMALE.equals(originalGender)) {
@@ -197,7 +197,7 @@ public class EditPersonalDetailsActivity extends AppCompatActivity {
 
     private void saveSettings() {
         String newBirthday = Objects.requireNonNull(editBirthday.getText()).toString();
-        Date newDate = DateParser.parse(newBirthday);
+        Date newDate = DateUtil.parse(newBirthday);
         if (newDate == null) {
             editBirthdayLayout.setError("Incorrect format");
         } else {

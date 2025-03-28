@@ -28,7 +28,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.csl.macrologandroid.R;
 import com.csl.macrologandroid.adapters.AutocompleteAdapter;
 import com.csl.macrologandroid.databinding.FragmentEditDiaryBinding;
-import com.csl.macrologandroid.dtos.LogEntryResponse;
+import com.csl.macrologandroid.models.LogEntry;
 import com.csl.macrologandroid.models.Meal;
 import com.csl.macrologandroid.util.KeyboardManager;
 import com.csl.macrologandroid.util.SpinnerSetupUtil;
@@ -165,14 +165,14 @@ public class EditDiaryFragment extends Fragment {
         viewModel.addSelectedFoodToEntries(selectedPortion, gramsOrAmount);
     }
 
-    private void addEntriesToLayout(final List<LogEntryResponse> logEntries) {
+    private void addEntriesToLayout(final List<LogEntry> logEntries) {
         logEntryLayout.removeAllViews();
         for (var logEntry : logEntries) {
             addEntryToLayout(logEntry);
         }
     }
 
-    private void addEntryToLayout(final LogEntryResponse logEntry) {
+    private void addEntryToLayout(final LogEntry logEntry) {
         final var row = (ConstraintLayout) getLayoutInflater().inflate(R.layout.layout_edit_log_entry, null);
         final var foodNameTextView = (TextView) row.findViewById(R.id.food_name);
         foodNameTextView.setText(logEntry.getFood().getName());
@@ -198,7 +198,7 @@ public class EditDiaryFragment extends Fragment {
         saveButton.setVisibility(View.VISIBLE);
     }
 
-    private void setupPortionSpinner(final Spinner foodPortion, final LogEntryResponse logEntry,
+    private void setupPortionSpinner(final Spinner foodPortion, final LogEntry logEntry,
                                      final TextInputEditText foodAmount) {
         final var portionList = logEntry.getFood().getPortions().stream().map(p -> p.getDescription() + " (" + p.getGrams() + " gr)").collect(Collectors.toList());
         portionList.add("gram");

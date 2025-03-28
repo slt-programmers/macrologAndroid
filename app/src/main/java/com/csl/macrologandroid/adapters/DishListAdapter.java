@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.csl.macrologandroid.R;
 import com.csl.macrologandroid.dtos.DishResponse;
 import com.csl.macrologandroid.dtos.IngredientResponse;
-import com.csl.macrologandroid.dtos.PortionResponse;
+import com.csl.macrologandroid.dtos.PortionDto;
 
 import java.util.List;
 import java.util.Locale;
@@ -66,8 +66,8 @@ public class DishListAdapter extends RecyclerView.Adapter<DishListAdapter.DishVi
             TextView portionName;
 
             if (ingredient.getPortion() != null ) {
-                PortionResponse usedPortion = null;
-                for (PortionResponse portion : ingredient.getFood().getPortions()) {
+                PortionDto usedPortion = null;
+                for (PortionDto portion : ingredient.getFood().getPortions()) {
                     if (portion.getId().equals(ingredient.getPortion().getId())) {
                         usedPortion = portion;
                         break;

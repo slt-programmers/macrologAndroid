@@ -5,10 +5,10 @@ import java.io.Serializable;
 public class IngredientResponse implements Serializable {
 
     private Double multiplier;
-    private FoodResponse food;
-    private PortionResponse portion;
+    private FoodDto food;
+    private PortionDto portion;
 
-    public IngredientResponse(Double multiplier, FoodResponse food,  PortionResponse portion) {
+    public IngredientResponse(Double multiplier, FoodDto food, PortionDto portion) {
         this.multiplier = multiplier;
         this.food = food;
         this.portion = portion;
@@ -22,19 +22,19 @@ public class IngredientResponse implements Serializable {
         this.multiplier = multiplier;
     }
 
-    public FoodResponse getFood() {
+    public FoodDto getFood() {
         return food;
     }
 
-    public void setFood(FoodResponse food) {
+    public void setFood(FoodDto food) {
         this.food = food;
     }
 
-    public PortionResponse getPortion() {
+    public PortionDto getPortion() {
         return portion;
     }
 
-    public void setPortion(PortionResponse portion) {
+    public void setPortion(PortionDto portion) {
         this.portion = portion;
     }
 }

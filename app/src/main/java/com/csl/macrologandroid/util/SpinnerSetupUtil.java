@@ -10,8 +10,10 @@ import android.widget.Spinner;
 
 import androidx.appcompat.widget.AppCompatTextView;
 
-import com.csl.macrologandroid.dtos.FoodResponse;
-import com.csl.macrologandroid.dtos.PortionResponse;
+import com.csl.macrologandroid.dtos.FoodDto;
+import com.csl.macrologandroid.dtos.PortionDto;
+import com.csl.macrologandroid.models.Food;
+import com.csl.macrologandroid.models.Portion;
 import com.google.android.material.textfield.TextInputEditText;
 
 import java.util.ArrayList;
@@ -19,8 +21,8 @@ import java.util.List;
 
 public class SpinnerSetupUtil {
 
-    public FoodResponse getFoodFromList(String foodname, List<FoodResponse> allFood) {
-        for (FoodResponse food : allFood) {
+    public Food getFoodFromList(String foodname, List<Food> allFood) {
+        for (Food food : allFood) {
             if (food.getName().trim().equals(foodname.trim())) {
                 return food;
             }
@@ -28,9 +30,9 @@ public class SpinnerSetupUtil {
         return null;
     }
 
-    private List<String> getPortionList(FoodResponse selectedFood) {
+    private List<String> getPortionList(Food selectedFood) {
         List<String> list = new ArrayList<>();
-        for (PortionResponse portion : selectedFood.getPortions()) {
+        for (Portion portion : selectedFood.getPortions()) {
             String desc = portion.getDescription();
             if (desc != null && !desc.isEmpty()) {
                 list.add(desc);
@@ -40,7 +42,7 @@ public class SpinnerSetupUtil {
         return list;
     }
 
-    public void setupPortionUnitSpinner(Context context, FoodResponse selectedFood, Spinner editPortionOrUnitSpinner, TextInputEditText editGramsOrAmount, SharedPreferences prefs) {
+    public void setupPortionUnitSpinner(Context context, Food selectedFood, Spinner editPortionOrUnitSpinner, TextInputEditText editGramsOrAmount, SharedPreferences prefs) {
         List<String> list = getPortionList(selectedFood);
 
         String prefPortion = prefs.getString(selectedFood.getName().toUpperCase(), null);

@@ -83,6 +83,9 @@ public class DiaryFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         diaryViewModel.getMUserSettings().observe(getViewLifecycleOwner(), this::setGoalIntake);
+        diaryViewModel.getMLocalLogEntries().observe(getViewLifecycleOwner(), (localLogEntries) -> {
+
+        });
         diaryViewModel.getMLogEntries().observe(getViewLifecycleOwner(), (logEntries) -> {
             updateTotals();
             updateLogEntries();

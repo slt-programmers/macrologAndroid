@@ -46,6 +46,7 @@ dependencies {
     implementation libs.navigation.fragment
     implementation libs.navigation.ui
     implementation libs.room.runtime
+    implementation libs.room.rxjava3
     implementation libs.retrofit
     implementation libs.converter.gson
     implementation libs.adapter.rxjava3

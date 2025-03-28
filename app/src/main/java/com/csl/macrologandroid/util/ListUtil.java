@@ -1,17 +1,17 @@
 package com.csl.macrologandroid.util;
 
-import com.csl.macrologandroid.dtos.FoodResponse;
+import com.csl.macrologandroid.dtos.FoodDto;
 import com.csl.macrologandroid.dtos.IngredientResponse;
-import com.csl.macrologandroid.dtos.PortionResponse;
+import com.csl.macrologandroid.dtos.PortionDto;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ListUtil {
 
-    public static List<String> getPortionDescList(List<PortionResponse> portionList, boolean includeGrams) {
+    public static List<String> getPortionDescList(List<PortionDto> portionList, boolean includeGrams) {
         List<String> list = new ArrayList<>();
-        for (PortionResponse portion : portionList) {
+        for (PortionDto portion : portionList) {
             String desc = portion.getDescription();
             if (desc != null && !desc.isEmpty()) {
                 if (includeGrams) {
@@ -34,8 +34,8 @@ public class ListUtil {
         return false;
     }
 
-    public static boolean isFoodInList(String foodName, List<FoodResponse> allFood) {
-        for (FoodResponse food : allFood) {
+    public static boolean isFoodInList(String foodName, List<FoodDto> allFood) {
+        for (FoodDto food : allFood) {
             if (foodName.equals(food.getName())) {
                 return true;
             }
@@ -43,8 +43,8 @@ public class ListUtil {
         return false;
     }
 
-    public static PortionResponse getPortionFromListByName(String portionName, List<PortionResponse> allPortions) {
-        for (PortionResponse portion : allPortions) {
+    public static PortionDto getPortionFromListByName(String portionName, List<PortionDto> allPortions) {
+        for (PortionDto portion : allPortions) {
             if (portionName.contains("gr)")) {
                 portionName = portionName.substring(0, portionName.indexOf(" ("));
             }
@@ -55,9 +55,9 @@ public class ListUtil {
         return null;
     }
 
-    public static PortionResponse getPortionFromListByName(String portionName, FoodResponse food) {
-        List<PortionResponse> portions = food.getPortions();
-        for (PortionResponse portion : portions) {
+    public static PortionDto getPortionFromListByName(String portionName, FoodDto food) {
+        List<PortionDto> portions = food.getPortions();
+        for (PortionDto portion : portions) {
             if (portionName.contains("gr)")) {
                 portionName = portionName.substring(0, portionName.indexOf(" ("));
             }
@@ -69,8 +69,8 @@ public class ListUtil {
         return null;
     }
 
-    public static PortionResponse getPortionFromListById(Long portionId, List<PortionResponse> portions) {
-        for (PortionResponse portion : portions) {
+    public static PortionDto getPortionFromListById(Long portionId, List<PortionDto> portions) {
+        for (PortionDto portion : portions) {
             if (portionId.equals(portion.getId())) {
                 return portion;
             }
@@ -79,9 +79,9 @@ public class ListUtil {
     }
 
 
-    public static PortionResponse getPortionFromListById(Long portionId, FoodResponse food) {
-        List<PortionResponse> portions = food.getPortions();
-        for (PortionResponse portion : portions) {
+    public static PortionDto getPortionFromListById(Long portionId, FoodDto food) {
+        List<PortionDto> portions = food.getPortions();
+        for (PortionDto portion : portions) {
             if (portionId.equals(portion.getId())) {
                 return portion;
             }

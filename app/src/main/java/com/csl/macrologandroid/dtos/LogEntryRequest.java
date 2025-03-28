@@ -5,7 +5,12 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-public class EntryDto implements Serializable {
+import lombok.Builder;
+import lombok.Getter;
+
+@Builder
+@Getter
+public class LogEntryRequest implements Serializable {
 
     @Expose
     @SerializedName("id")
@@ -13,11 +18,11 @@ public class EntryDto implements Serializable {
 
     @Expose
     @SerializedName("food")
-    private final FoodResponse food;
+    private final FoodDto food;
 
     @Expose
     @SerializedName("portion")
-    private final PortionResponse portion;
+    private final PortionDto portion;
 
     @Expose
     @SerializedName("multiplier")
@@ -31,7 +36,7 @@ public class EntryDto implements Serializable {
     @SerializedName("meal")
     private final String meal;
 
-    public EntryDto(Long id, FoodResponse food, PortionResponse portion, double multiplier, String day, String meal) {
+    public LogEntryRequest(Long id, FoodDto food, PortionDto portion, double multiplier, String day, String meal) {
         this.id = id;
         this.food = food;
         this.portion = portion;

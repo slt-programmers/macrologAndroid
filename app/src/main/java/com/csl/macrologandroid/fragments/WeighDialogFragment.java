@@ -17,7 +17,7 @@ import android.widget.TextView;
 
 import com.csl.macrologandroid.R;
 import com.csl.macrologandroid.dtos.WeightRequest;
-import com.csl.macrologandroid.util.DateParser;
+import com.csl.macrologandroid.util.DateUtil;
 import java.util.Date;
 import java.util.Objects;
 
@@ -44,7 +44,7 @@ public class WeighDialogFragment extends DialogFragment {
         ConstraintLayout dialogView = (ConstraintLayout) inflater.inflate(R.layout.dialog_weight, null);
 
         TextInputLayout dateInputLayout = (TextInputLayout) dialogView.getChildAt(0);
-        Objects.requireNonNull(dateInputLayout.getEditText()).setText(DateParser.format(new Date()));
+        Objects.requireNonNull(dateInputLayout.getEditText()).setText(DateUtil.format(new Date()));
 
         TextInputLayout weightInputLayout = (TextInputLayout) dialogView.getChildAt(1);
         Objects.requireNonNull(weightInputLayout.getEditText()).setText(String.valueOf(currentWeight));
@@ -59,9 +59,9 @@ public class WeighDialogFragment extends DialogFragment {
         builder.setCustomTitle(customTitle)
                 .setView(dialogView)
                 .setPositiveButton(R.string.done, (dialog, id) -> {
-                    Date newDate = DateParser.parse(dateInputLayout.getEditText().getText().toString());
+                    Date newDate = DateUtil.parse(dateInputLayout.getEditText().getText().toString());
                     double newWeight = Double.parseDouble(weightInputLayout.getEditText().getText().toString());
-                    WeightRequest weightRequest = new WeightRequest(null, newWeight, DateParser.format(newDate));
+                    WeightRequest weightRequest = new WeightRequest(null, newWeight, DateUtil.format(newDate));
                     onDialogResult.finish(weightRequest);
                 })
                 .setNegativeButton(R.string.cancel, (dialog, id) -> Objects.requireNonNull(getDialog()).cancel());

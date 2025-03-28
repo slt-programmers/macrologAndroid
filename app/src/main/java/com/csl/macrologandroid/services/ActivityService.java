@@ -3,7 +3,7 @@ package com.csl.macrologandroid.services;
 import com.csl.macrologandroid.BuildConfig;
 import com.csl.macrologandroid.dtos.ActivityRequest;
 import com.csl.macrologandroid.dtos.ActivityResponse;
-import com.csl.macrologandroid.util.DateParser;
+import com.csl.macrologandroid.util.DateUtil;
 
 import java.util.Date;
 import java.util.List;
@@ -46,11 +46,11 @@ public class ActivityService {
     }
 
     public Observable<List<ActivityResponse>> getActivitiesForDay(Date date) {
-        return apiService.getActivitiesForDay(DateParser.format(date));
+        return apiService.getActivitiesForDay(DateUtil.format(date));
     }
 
     public Observable<List<ActivityResponse>> postActivitiesForDay(List<ActivityRequest> activities, Date date) {
-        String day = DateParser.format(date);
+        String day = DateUtil.format(date);
         return apiService.postActivitiesForDay(day, activities);
     }
 

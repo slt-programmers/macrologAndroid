@@ -15,10 +15,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.csl.macrologandroid.cache.FoodCache;
-import com.csl.macrologandroid.dtos.FoodResponse;
-import com.csl.macrologandroid.dtos.PortionResponse;
+import com.csl.macrologandroid.dtos.FoodDto;
+import com.csl.macrologandroid.dtos.PortionDto;
 import com.csl.macrologandroid.lifecycle.Session;
-import com.csl.macrologandroid.services.FoodService;
+import com.csl.macrologandroid.services.FoodClient;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -38,7 +38,7 @@ public class AddFoodActivity extends AppCompatActivity {
     private Button saveButton;
     private TextInputLayout editFoodNameLayout;
 
-    private FoodResponse foodResponse;
+    private FoodDto foodDto;
     private Disposable disposable;
     private final List<String> allFoodNames = new ArrayList<>();
 
@@ -47,8 +47,8 @@ public class AddFoodActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_food);
 
-        List<FoodResponse> allFood = FoodCache.getInstance().getCache();
-        for (FoodResponse food : allFood) {
+        List<FoodDto> allFood = FoodCache.getInstance().getCache();
+        for (FoodDto food : allFood) {
             allFoodNames.add(food.getName());
         }
 
@@ -56,7 +56,7 @@ public class AddFoodActivity extends AppCompatActivity {
         backButton.setOnClickListener(v -> finish());
 
         Intent intent = getIntent();
-        foodResponse = (FoodResponse) intent.getSerializableExtra("FOOD_RESPONSE");
+        foodDto = (FoodDto) intent.getSerializableExtra("FOOD_RESPONSE");
         String foodName = intent.getStringExtra("FOOD_NAME");
 
         editFoodNameLayout = findViewById(R.id.food_name_layout);
@@ -79,12 +79,12 @@ public class AddFoodActivity extends AppCompatActivity {
             saveButton.setEnabled(false);
         });
 
-        if (foodResponse != null) {
-            editFoodName.setText(foodResponse.getName());
-            editProtein.setText(String.valueOf(foodResponse.getProtein()));
-            editFat.setText(String.valueOf(foodResponse.getFat()));
-            editCarbs.setText(String.valueOf(foodResponse.getCarbs()));
-            for (PortionResponse portion : foodResponse.getPortions()) {
+        if (foodDto != null) {
+            editFoodName.setText(foodDto.getName());
+            editProtein.setText(String.valueOf(foodDto.getProtein()));
+            editFat.setText(String.valueOf(foodDto.getFat()));
+            editCarbs.setText(String.valueOf(foodDto.getCarbs()));
+            for (PortionDto portion : foodDto.getPortions()) {
                 addPortion(portionsLayout, portion);
             }
         } else {
@@ -96,11 +96,11 @@ public class AddFoodActivity extends AppCompatActivity {
 
     private void isSaveButtonEnabled() {
         boolean nameCheck = editFoodName.getText() != null && editFoodName.getText().toString().length() != 0;
-        if (foodResponse == null) {
+        if (foodDto == null) {
             // Adding a new food. Food may not be added twice, so check name
             nameCheck = nameCheck && !matchingFoodName(editFoodName.getText().toString());
         } else {
-            boolean foodNameChanged = !foodResponse.getName().equals(editFoodName.getText().toString());
+            boolean foodNameChanged = !foodDto.getName().equals(editFoodName.getText().toString());
             if (foodNameChanged) {
                 // If altering the name, the new name may not be present in the database
                 nameCheck = nameCheck && !matchingFoodName(editFoodName.getText().toString());
@@ -151,7 +151,7 @@ public class AddFoodActivity extends AppCompatActivity {
         }
     }
 
-    private void addPortion(LinearLayout container, PortionResponse portion) {
+    private void addPortion(LinearLayout container, PortionDto portion) {
         ConstraintLayout newPortionLayout = (ConstraintLayout) getLayoutInflater().inflate(R.layout.layout_add_portion, container, false);
         TextInputEditText portionDescription = newPortionLayout.findViewById(R.id.portion_description);
         portionDescription.addTextChangedListener(textWatcher);
@@ -185,24 +185,24 @@ public class AddFoodActivity extends AppCompatActivity {
         double fat = Double.parseDouble(Objects.requireNonNull(editFat.getText()).toString());
         double carbs = Double.parseDouble(Objects.requireNonNull(editCarbs.getText()).toString());
 
-        List<PortionResponse> portions = new ArrayList<>();
+        List<PortionDto> portions = new ArrayList<>();
         int childCount = portionsLayout.getChildCount();
         for (int i = 0; i < childCount; i++) {
             ConstraintLayout inner = (ConstraintLayout) portionsLayout.getChildAt(i);
             TextInputEditText portionDescription = inner.findViewById(R.id.portion_description);
             TextInputEditText portionGrams = inner.findViewById(R.id.portion_grams);
             String description = Objects.requireNonNull(portionDescription.getText()).toString();
-            PortionResponse portion = new PortionResponse(findIdForPortion(i),
+            PortionDto portion = new PortionDto(findIdForPortion(i),
                     Double.parseDouble(Objects.requireNonNull(portionGrams.getText()).toString()),
                     description.trim());
             portions.add(portion);
         }
-        FoodResponse newFood = new FoodResponse(null, name, protein, fat, carbs, portions);
-        if (foodResponse != null) {
-            newFood.setId(foodResponse.getId());
+        FoodDto newFood = new FoodDto(null, name, protein, fat, carbs, portions);
+        if (foodDto != null) {
+            newFood.setId(foodDto.getId());
         }
-        FoodService foodService = new FoodService(getToken());
-        disposable = foodService.postFood(newFood)
+        FoodClient foodClient = new FoodClient(getToken());
+        disposable = foodClient.postFood(newFood)
                 .subscribe(res -> {
                     Intent resultIntent = new Intent();
                     resultIntent.putExtra("FOOD_NAME", editFoodName.getText().toString());
@@ -213,11 +213,11 @@ public class AddFoodActivity extends AppCompatActivity {
     }
 
     private Long findIdForPortion(int index) {
-        if (foodResponse != null) {
-            List<PortionResponse> portions = foodResponse.getPortions();
+        if (foodDto != null) {
+            List<PortionDto> portions = foodDto.getPortions();
             if (portions != null && !portions.isEmpty()) {
                 try {
-                    PortionResponse portion = portions.get(index);
+                    PortionDto portion = portions.get(index);
                     return portion.getId();
                 } catch (Exception ex) {
                     return null;
@@ -255,7 +255,7 @@ public class AddFoodActivity extends AppCompatActivity {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            if (foodResponse == null) { // new food
+            if (foodDto == null) { // new food
                 if (matchingFoodName(s.toString())) {
                     editFoodNameLayout.setErrorEnabled(true);
                     editFoodNameLayout.setError("You've already added this product");
@@ -265,7 +265,7 @@ public class AddFoodActivity extends AppCompatActivity {
                 }
             } else {
                 // edit food
-                if (foodResponse.getName().equalsIgnoreCase(s.toString())) {
+                if (foodDto.getName().equalsIgnoreCase(s.toString())) {
                     // nothing altered
                     editFoodNameLayout.setErrorEnabled(false);
                     editFoodNameLayout.setError("");

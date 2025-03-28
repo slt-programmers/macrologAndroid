@@ -28,11 +28,11 @@ import com.csl.macrologandroid.adapters.AutocompleteAdapter;
 import com.csl.macrologandroid.cache.DishCache;
 import com.csl.macrologandroid.cache.FoodCache;
 import com.csl.macrologandroid.dtos.DishResponse;
-import com.csl.macrologandroid.dtos.FoodResponse;
+import com.csl.macrologandroid.dtos.FoodDto;
 import com.csl.macrologandroid.dtos.IngredientResponse;
-import com.csl.macrologandroid.dtos.PortionResponse;
+import com.csl.macrologandroid.dtos.PortionDto;
 import com.csl.macrologandroid.services.DishService;
-import com.csl.macrologandroid.services.FoodService;
+import com.csl.macrologandroid.services.FoodClient;
 import com.csl.macrologandroid.util.ListUtil;
 import com.csl.macrologandroid.util.SpinnerSetupUtil;
 import com.google.android.material.textfield.TextInputEditText;
@@ -57,7 +57,7 @@ public class DishActivity extends AppCompatActivity {
     private AutoCompleteTextView searchFoodTextView;
     private final List<String> autoCompleteList = new ArrayList<>();
     private Disposable foodDisposable;
-    private List<FoodResponse> allFood;
+    private List<FoodDto> allFood;
     private List<IngredientResponse> displayedIngredients = new ArrayList<>();
 
     @Override
@@ -77,8 +77,8 @@ public class DishActivity extends AppCompatActivity {
         searchFoodTextView = findViewById(R.id.search_food);
         allFood = FoodCache.getInstance().getCache();
         if (allFood.size() == 0) {
-            FoodService foodService = new FoodService(getToken());
-            foodDisposable = foodService.getAllFood().subscribe(res -> {
+            FoodClient foodClient = new FoodClient(getToken());
+            foodDisposable = foodClient.getAllFood().subscribe(res -> {
                         allFood = res;
                         autoCompleteList.clear();
                         autoCompleteList.addAll(getFoodAutoCompleteList(allFood));
@@ -125,9 +125,9 @@ public class DishActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
-    private List<String> getFoodAutoCompleteList(List<FoodResponse> allFood) {
+    private List<String> getFoodAutoCompleteList(List<FoodDto> allFood) {
         List<String> autoCompleteList = new ArrayList<>();
-        for (FoodResponse food : allFood) {
+        for (FoodDto food : allFood) {
             autoCompleteList.add(food.getName());
         }
         return autoCompleteList;
@@ -139,11 +139,12 @@ public class DishActivity extends AppCompatActivity {
         searchFoodTextView.setThreshold(2);
         searchFoodTextView.setOnItemClickListener((parent, view, position, id) -> {
             String foodName = ((AppCompatCheckedTextView) view).getText().toString();
-            FoodResponse selectedFood = new SpinnerSetupUtil().getFoodFromList(foodName, allFood);
-            IngredientResponse ingredientResponse = new IngredientResponse(1.0, selectedFood, null);
-            displayedIngredients.add(ingredientResponse);
-            searchFoodTextView.setText("");
-            addIngredientToLayout(ingredientResponse);
+            // TODO
+//            FoodDto selectedFood = new SpinnerSetupUtil().getFoodFromList(foodName, allFood);
+//            IngredientResponse ingredientResponse = new IngredientResponse(1.0, selectedFood, null);
+//            displayedIngredients.add(ingredientResponse);
+//            searchFoodTextView.setText("");
+//            addIngredientToLayout(ingredientResponse);
         });
 
         searchFoodTextView.setOnEditorActionListener((v, actionId, event) -> {
@@ -196,14 +197,14 @@ public class DishActivity extends AppCompatActivity {
     }
 
     private void setupPortionSpinner(Spinner portionSpinner, IngredientResponse ingredient, TextInputEditText amount) {
-        List<PortionResponse> allPortions = ingredient.getFood().getPortions();
+        List<PortionDto> allPortions = ingredient.getFood().getPortions();
         List<String> portionDescList = ListUtil.getPortionDescList(allPortions, true);
 
         ArrayAdapter<String> portionSpinnerAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, portionDescList);
         portionSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         portionSpinner.setAdapter(portionSpinnerAdapter);
         if (ingredient.getPortion() != null) {
-            PortionResponse portion = ListUtil.getPortionFromListById(ingredient.getPortion().getId(), allPortions);
+            PortionDto portion = ListUtil.getPortionFromListById(ingredient.getPortion().getId(), allPortions);
             if (portion != null) {
                 int index = portionDescList.indexOf(portion.getDescription() + " (" + portion.getGrams() + " gr)");
                 portionSpinner.setSelection(index);
@@ -278,8 +279,8 @@ public class DishActivity extends AppCompatActivity {
         Spinner portionSpinner = (Spinner) inner.getChildAt(2);
         TextInputEditText amount = inner.findViewById(R.id.food_amount);
 
-        FoodResponse food = ingredient.getFood();
-        PortionResponse selectedPortion = null;
+        FoodDto food = ingredient.getFood();
+        PortionDto selectedPortion = null;
         String selectedPortionDesc = portionSpinner.getSelectedItem().toString();
         if (!selectedPortionDesc.equals("gram")) {
             selectedPortion = ListUtil.getPortionFromListByName(selectedPortionDesc, food);
