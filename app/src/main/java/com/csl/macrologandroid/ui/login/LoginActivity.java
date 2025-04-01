@@ -21,7 +21,7 @@ import android.widget.TextView;
 import com.csl.macrologandroid.ForgotPasswordActivity;
 import com.csl.macrologandroid.R;
 import com.csl.macrologandroid.RegisterActivity;
-import com.csl.macrologandroid.RoutingActivity;
+import com.csl.macrologandroid.StartupActivity;
 import com.csl.macrologandroid.databinding.ActivityLoginBinding;
 import com.csl.macrologandroid.lifecycle.Session;
 import com.csl.macrologandroid.util.ResetErrorTextWatcher;
@@ -107,7 +107,7 @@ public class LoginActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         if (Session.getInstance().isExpired()) {
-            Intent intent = new Intent(this, RoutingActivity.class);
+            Intent intent = new Intent(this, StartupActivity.class);
             intent.putExtra("SESSION_EXPIRED", true);
             startActivity(intent);
         }

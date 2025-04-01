@@ -82,7 +82,7 @@ public class RegisterActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         if (Session.getInstance().isExpired()) {
-            Intent intent = new Intent(RegisterActivity.this, RoutingActivity.class);
+            Intent intent = new Intent(RegisterActivity.this, StartupActivity.class);
             intent.putExtra("SESSION_EXPIRED", true);
             startActivity(intent);
         }

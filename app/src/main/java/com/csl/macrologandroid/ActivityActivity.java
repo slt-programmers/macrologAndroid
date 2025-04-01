@@ -115,7 +115,7 @@ public class ActivityActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         if (Session.getInstance().isExpired()) {
-            Intent intent = new Intent(ActivityActivity.this, RoutingActivity.class);
+            Intent intent = new Intent(ActivityActivity.this, StartupActivity.class);
             intent.putExtra("SESSION_EXPIRED", true);
             startActivity(intent);
         }

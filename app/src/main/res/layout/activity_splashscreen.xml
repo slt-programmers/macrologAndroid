@@ -8,7 +8,7 @@
     android:background="@drawable/background_gradient"
     android:gravity="center"
     android:orientation="vertical"
-    tools:context=".RoutingActivity">
+    tools:context=".StartupActivity">
 
     <TextView
         android:layout_width="match_parent"
