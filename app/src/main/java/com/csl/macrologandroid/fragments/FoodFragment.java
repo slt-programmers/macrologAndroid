@@ -27,7 +27,7 @@ import com.csl.macrologandroid.AddFoodActivity;
 import com.csl.macrologandroid.R;
 import com.csl.macrologandroid.cache.FoodCache;
 import com.csl.macrologandroid.dtos.FoodDto;
-import com.csl.macrologandroid.services.FoodClient;
+import com.csl.macrologandroid.data.network.FoodClient;
 import com.csl.macrologandroid.util.KeyboardManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 

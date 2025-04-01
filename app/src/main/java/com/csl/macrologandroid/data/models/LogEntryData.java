@@ -14,9 +14,9 @@ public class LogEntryData {
 
     @Embedded
     public LogEntryEntity logEntryEntity;
-    @Relation(parentColumn = "food_id", entityColumn = "id")
+    @Relation(parentColumn = "food_id", entityColumn = "external_id")
     public FoodEntity foodForEntity;
-    @Relation(parentColumn = "portion_id", entityColumn = "id")
+    @Relation(parentColumn = "portion_id", entityColumn = "external_id")
     public PortionEntity portionForEntity;
     @Relation(parentColumn = "food_id", entityColumn = "food_id")
     public List<PortionEntity> portionsForFood;

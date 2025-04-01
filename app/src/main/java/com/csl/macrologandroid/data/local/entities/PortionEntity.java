@@ -2,6 +2,7 @@ package com.csl.macrologandroid.data.local.entities;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
 import lombok.AllArgsConstructor;
@@ -11,7 +12,7 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-@Entity(tableName = "portions")
+@Entity(tableName = "portions", indices = {@Index(value = {"external_id"}, unique = true)})
 public class PortionEntity {
 
     @PrimaryKey(autoGenerate = true)
@@ -19,7 +20,7 @@ public class PortionEntity {
     @ColumnInfo(name = "external_id")
     private Long externalId;
     @ColumnInfo(name = "food_id")
-    private long foodId;
+    private Long foodId;
     private Double grams;
     private String description;
 

@@ -15,34 +15,20 @@ import java.util.List;
 @Dao
 public interface LogEntryDao {
 
-    @Query("SELECT * FROM logentries WHERE day = :date")
-    List<LogEntryEntity> getByDate(final String date);
+    @Transaction
+    @Query("select * from logentries where day = :date")
+    List<LogEntryData> getByDate(final String date);
 
     @Transaction
-    @Query("SELECT * FROM logentries WHERE day = :date")
-    LiveData<List<LogEntryData>> getLogEntriesByDate(final String date);
+    @Query("select * from logentries where day = :date and meal = :meal")
+    LiveData<List<LogEntryData>> getLogEntriesByDateAndMeal(final String date, final String meal);
 
     @Insert
     void insertAll(final List<LogEntryEntity> logEntryEntities);
 
     @Delete
     void delete(final LogEntryEntity logEntryEntity);
-}
 
-//public interface UserDao {
-//    @Query("SELECT * FROM user")
-//    List<User> getAll();
-//
-//    @Query("SELECT * FROM user WHERE uid IN (:userIds)")
-//    List<User> loadAllByIds(int[] userIds);
-//
-//    @Query("SELECT * FROM user WHERE first_name LIKE :first AND " +
-//            "last_name LIKE :last LIMIT 1")
-//    User findByName(String first, String last);
-//
-//    @Insert
-//    void insertAll(User... users);
-//
-//    @Delete
-//    void delete(User user);
-//}
+    @Query("delete from logentries where day = :date")
+    void deleteByDate(final String date);
+}

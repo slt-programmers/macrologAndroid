@@ -1,7 +1,7 @@
 package com.csl.macrologandroid.util;
 
 import com.csl.macrologandroid.dtos.FoodDto;
-import com.csl.macrologandroid.dtos.IngredientResponse;
+import com.csl.macrologandroid.dtos.IngredientDto;
 import com.csl.macrologandroid.dtos.PortionDto;
 
 import java.util.ArrayList;
@@ -25,8 +25,8 @@ public class ListUtil {
         return list;
     }
 
-    public static boolean isFoodInIngredientList(String foodName, List<IngredientResponse> ingredients) {
-        for (IngredientResponse ingredient : ingredients) {
+    public static boolean isFoodInIngredientList(String foodName, List<IngredientDto> ingredients) {
+        for (IngredientDto ingredient : ingredients) {
             if (foodName.equals(ingredient.getFood().getName())) {
                 return true;
             }

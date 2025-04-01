@@ -15,8 +15,8 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.csl.macrologandroid.R;
-import com.csl.macrologandroid.dtos.DishResponse;
-import com.csl.macrologandroid.dtos.IngredientResponse;
+import com.csl.macrologandroid.dtos.DishDto;
+import com.csl.macrologandroid.dtos.IngredientDto;
 import com.csl.macrologandroid.dtos.PortionDto;
 
 import java.util.List;
@@ -24,11 +24,11 @@ import java.util.Locale;
 
 public class DishListAdapter extends RecyclerView.Adapter<DishListAdapter.DishViewHolder> {
 
-    private final List<DishResponse> dishList;
+    private final List<DishDto> dishList;
     private final Context context;
     private OnEditClickListener onEditClickLister;
 
-    public DishListAdapter(Context context, List<DishResponse> dishList) {
+    public DishListAdapter(Context context, List<DishDto> dishList) {
         this.dishList = dishList;
         this.context = context;
     }
@@ -46,13 +46,13 @@ public class DishListAdapter extends RecyclerView.Adapter<DishListAdapter.DishVi
 
     @Override
     public void onBindViewHolder(@NonNull DishViewHolder viewHolder, int position) {
-        DishResponse dish = dishList.get(position);
+        DishDto dish = dishList.get(position);
         viewHolder.title.setText(dish.getName());
         viewHolder.edit.setOnClickListener((v) -> onEditClickLister.onEditClick(dish));
         viewHolder.ingredientLayout.removeAllViews();
 
-        List<IngredientResponse> ingredients = dish.getIngredients();
-        for (IngredientResponse ingredient : ingredients) {
+        List<IngredientDto> ingredients = dish.getIngredients();
+        for (IngredientDto ingredient : ingredients) {
             LinearLayout row = new LinearLayout(context);
             row.setOrientation(LinearLayout.HORIZONTAL);
 
@@ -155,6 +155,6 @@ public class DishListAdapter extends RecyclerView.Adapter<DishListAdapter.DishVi
     }
 
     public interface OnEditClickListener {
-        void onEditClick(DishResponse dish);
+        void onEditClick(DishDto dish);
     }
 }

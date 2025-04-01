@@ -27,14 +27,13 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.csl.macrologandroid.adapters.AutocompleteAdapter;
 import com.csl.macrologandroid.cache.DishCache;
 import com.csl.macrologandroid.cache.FoodCache;
-import com.csl.macrologandroid.dtos.DishResponse;
+import com.csl.macrologandroid.dtos.DishDto;
 import com.csl.macrologandroid.dtos.FoodDto;
-import com.csl.macrologandroid.dtos.IngredientResponse;
+import com.csl.macrologandroid.dtos.IngredientDto;
 import com.csl.macrologandroid.dtos.PortionDto;
-import com.csl.macrologandroid.services.DishService;
-import com.csl.macrologandroid.services.FoodClient;
+import com.csl.macrologandroid.data.network.DishClient;
+import com.csl.macrologandroid.data.network.FoodClient;
 import com.csl.macrologandroid.util.ListUtil;
-import com.csl.macrologandroid.util.SpinnerSetupUtil;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -48,7 +47,7 @@ public class DishActivity extends AppCompatActivity {
 
     private final List<String> allDishNames = new ArrayList<>();
 
-    private DishResponse dishResponse;
+    private DishDto dishDto;
     private TextInputLayout editDishNameLayout;
     private TextInputEditText editDishName;
     private LinearLayout ingredientsLayout;
@@ -58,15 +57,15 @@ public class DishActivity extends AppCompatActivity {
     private final List<String> autoCompleteList = new ArrayList<>();
     private Disposable foodDisposable;
     private List<FoodDto> allFood;
-    private List<IngredientResponse> displayedIngredients = new ArrayList<>();
+    private List<IngredientDto> displayedIngredients = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_dish);
 
-        List<DishResponse> allDishes = DishCache.getInstance().getCache();
-        for (DishResponse dish : allDishes) {
+        List<DishDto> allDishes = DishCache.getInstance().getCache();
+        for (DishDto dish : allDishes) {
             allDishNames.add(dish.getName());
         }
 
@@ -95,17 +94,17 @@ public class DishActivity extends AppCompatActivity {
         backButton.setOnClickListener(v -> finish());
 
         Intent intent = getIntent();
-        dishResponse = (DishResponse) intent.getSerializableExtra("DISH");
+        dishDto = (DishDto) intent.getSerializableExtra("DISH");
         ingredientsLayout = findViewById(R.id.ingredients_layout);
 
         saveButton = findViewById(R.id.save_button);
         saveButton.setOnClickListener(v -> saveDish());
 
         // Add or edit
-        if (dishResponse != null) {
-            editDishName.setText(dishResponse.getName());
-            displayedIngredients = dishResponse.getIngredients();
-            for (IngredientResponse ingredient : displayedIngredients) {
+        if (dishDto != null) {
+            editDishName.setText(dishDto.getName());
+            displayedIngredients = dishDto.getIngredients();
+            for (IngredientDto ingredient : displayedIngredients) {
                 addIngredientToLayout(ingredient);
             }
         } else {
@@ -162,7 +161,7 @@ public class DishActivity extends AppCompatActivity {
         });
     }
 
-    private void addIngredientToLayout(IngredientResponse ingredient) {
+    private void addIngredientToLayout(IngredientDto ingredient) {
         @SuppressLint("InflateParams")
         ConstraintLayout ingredientEntry = (ConstraintLayout) getLayoutInflater().inflate(R.layout.layout_edit_log_entry, null);
 
@@ -196,7 +195,7 @@ public class DishActivity extends AppCompatActivity {
         ingredientsLayout.addView(ingredientEntry);
     }
 
-    private void setupPortionSpinner(Spinner portionSpinner, IngredientResponse ingredient, TextInputEditText amount) {
+    private void setupPortionSpinner(Spinner portionSpinner, IngredientDto ingredient, TextInputEditText amount) {
         List<PortionDto> allPortions = ingredient.getFood().getPortions();
         List<String> portionDescList = ListUtil.getPortionDescList(allPortions, true);
 
@@ -234,7 +233,7 @@ public class DishActivity extends AppCompatActivity {
         });
     }
 
-    private void removeIngredient(IngredientResponse ingredient) {
+    private void removeIngredient(IngredientDto ingredient) {
         int index = displayedIngredients.indexOf(ingredient);
         ConstraintLayout inner = (ConstraintLayout) ingredientsLayout.getChildAt(index);
         displayedIngredients.remove(ingredient);
@@ -247,17 +246,17 @@ public class DishActivity extends AppCompatActivity {
             return;
         }
 
-        Long dishId = getDishId(dishResponse);
+        Long dishId = getDishId(dishDto);
         String dishName = Objects.requireNonNull(editDishName.getText()).toString();
 
-        List<IngredientResponse> newIngredients = new ArrayList<>();
+        List<IngredientDto> newIngredients = new ArrayList<>();
         for (int i = 0; i < displayedIngredients.size(); i++) {
             getPortionAndAmountFromView(newIngredients, i);
         }
 
-        DishResponse newDish = new DishResponse(dishId, dishName, newIngredients);
-        DishService dishService = new DishService(getToken());
-        disposable = dishService.postDish(newDish)
+        DishDto newDish = new DishDto(dishId, dishName, newIngredients);
+        DishClient dishClient = new DishClient(getToken());
+        disposable = dishClient.postDish(newDish)
                 .subscribe(res -> {
                     Intent resultIntent = new Intent();
                     setResult(Activity.RESULT_OK, resultIntent);
@@ -266,15 +265,15 @@ public class DishActivity extends AppCompatActivity {
 
     }
 
-    private Long getDishId(DishResponse dishResponse) {
-        if (dishResponse != null) {
-            return dishResponse.getId();
+    private Long getDishId(DishDto dishDto) {
+        if (dishDto != null) {
+            return dishDto.getId();
         }
         return null;
     }
 
-    private void getPortionAndAmountFromView(List<IngredientResponse> newIngredients, int index) {
-        IngredientResponse ingredient = displayedIngredients.get(index);
+    private void getPortionAndAmountFromView(List<IngredientDto> newIngredients, int index) {
+        IngredientDto ingredient = displayedIngredients.get(index);
         ConstraintLayout inner = (ConstraintLayout) ingredientsLayout.getChildAt(index);
         Spinner portionSpinner = (Spinner) inner.getChildAt(2);
         TextInputEditText amount = inner.findViewById(R.id.food_amount);
@@ -290,17 +289,17 @@ public class DishActivity extends AppCompatActivity {
             multiplier = multiplier / 100;
         }
 
-        IngredientResponse newIngredient = new IngredientResponse(multiplier, food, selectedPortion);
+        IngredientDto newIngredient = new IngredientDto(ingredient.getId(), multiplier, food, selectedPortion);
         newIngredients.add(newIngredient);
     }
 
     private void isSaveButtonEnabled() {
         boolean nameCheck = editDishName.getText() != null && editDishName.getText().toString().length() != 0;
-        if (dishResponse == null) {
+        if (dishDto == null) {
             // Adding a new dish. Dish name can not be the same twice, so check name
             nameCheck = nameCheck && !allDishNames.contains(editDishName.getText().toString());
         } else {
-            boolean foodNameChanged = !dishResponse.getName().equals(editDishName.getText().toString());
+            boolean foodNameChanged = !dishDto.getName().equals(editDishName.getText().toString());
             if (foodNameChanged) {
                 // If altering the name, the new name may not be present in the database
                 nameCheck = nameCheck && !allDishNames.contains(editDishName.getText().toString());
@@ -330,7 +329,7 @@ public class DishActivity extends AppCompatActivity {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            if (dishResponse == null) { // new dish
+            if (dishDto == null) { // new dish
                 if (allDishNames.contains(s.toString())) {
                     editDishNameLayout.setErrorEnabled(true);
                     editDishNameLayout.setError("You already have a dish named like this");
@@ -340,7 +339,7 @@ public class DishActivity extends AppCompatActivity {
                 }
             } else {
                 // edit dish
-                if (dishResponse.getName().equalsIgnoreCase(s.toString())) {
+                if (dishDto.getName().equalsIgnoreCase(s.toString())) {
                     // nothing altered
                     editDishNameLayout.setErrorEnabled(false);
                     editDishNameLayout.setError("");

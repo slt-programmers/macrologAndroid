@@ -59,7 +59,6 @@ public class EditDiaryFragment extends Fragment {
         binding = FragmentEditDiaryBinding.inflate(inflater, container, false);
         root = binding.getRoot();
         procesFragmentArguments();
-        viewModel.initLogEntries();
 
         final var backButton = root.findViewById(R.id.back_button);
         backButton.setOnClickListener(v -> requireActivity().finish());
@@ -89,6 +88,7 @@ public class EditDiaryFragment extends Fragment {
             autocompleteTextView.setAdapter(autocompleteAdapter);
         });
         viewModel.getMLogEntries().observe(getViewLifecycleOwner(), this::addEntriesToLayout);
+        viewModel.initLogEntries();
     }
 
     @Override

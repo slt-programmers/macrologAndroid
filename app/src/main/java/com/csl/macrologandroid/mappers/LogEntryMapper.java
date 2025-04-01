@@ -3,6 +3,7 @@ package com.csl.macrologandroid.mappers;
 import android.util.Log;
 
 import com.csl.macrologandroid.data.local.entities.LogEntryEntity;
+import com.csl.macrologandroid.data.models.FoodData;
 import com.csl.macrologandroid.data.models.LogEntryData;
 import com.csl.macrologandroid.dtos.LogEntryRequest;
 import com.csl.macrologandroid.dtos.LogEntryResponse;
@@ -29,17 +30,23 @@ public class LogEntryMapper {
         );
     }
 
-    public static List<LogEntryEntity> mapResponsesToEntities(final List<LogEntryResponse> responses) {
-        return responses.stream().map(LogEntryMapper::mapResponseToEntity).toList();
+    public static List<LogEntryEntity> mapResponsesToEntities(final List<LogEntryResponse> responses,
+                                                              final List<FoodData> foodDatas) {
+        return responses.stream().map(response -> {
+            final var food = foodDatas.stream().filter(f -> response.getFood().getId().equals(f.foodEntity.getExternalId())).toList().get(0);
+            return mapResponseToEntity(response, food);
+        }).toList();
     }
 
-    public static LogEntryEntity mapResponseToEntity(final LogEntryResponse response) {
+    public static LogEntryEntity mapResponseToEntity(final LogEntryResponse response, final FoodData foodData) {
+        final var portionExternalId = response.getPortion() != null ? response.getPortion().getId() : null;
+        final var portionEntity = portionExternalId != null ? foodData.portionEntities.stream().filter(p -> portionExternalId.equals(p.getExternalId())).toList().get(0) : null;
         return LogEntryEntity.builder()
                 .externalId((long) response.getId())
                 .day(FORMAT.format(response.getDay()))
                 .meal(response.getMeal().name())
-                .foodId(response.getFood().getId())
-                .portionId(response.getPortion() != null ? response.getPortion().getId() : null)
+                .foodId(foodData.foodEntity.getId())
+                .portionId(portionEntity != null ? portionEntity.getId() : null)
                 .multiplier(response.getMultiplier())
                 .build();
     }
@@ -55,7 +62,7 @@ public class LogEntryMapper {
         final var food = FoodMapper.mapEntityToModel(data.foodForEntity, data.portionsForFood);
         final var portion = PortionMapper.mapEntityToModel(data.portionForEntity);
         return LogEntry.builder()
-                .id((long) data.logEntryEntity.getId())
+                .id(data.logEntryEntity.getId())
                 .externalId(data.logEntryEntity.getExternalId())
                 .day(data.logEntryEntity.getDay())
                 .meal(data.logEntryEntity.getMeal())

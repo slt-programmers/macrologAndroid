@@ -1,6 +1,6 @@
 package com.csl.macrologandroid.cache;
 
-import com.csl.macrologandroid.dtos.DishResponse;
+import com.csl.macrologandroid.dtos.DishDto;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,7 @@ public class DishCache {
 
     private static DishCache instance;
 
-    private List<DishResponse> cache;
+    private List<DishDto> cache;
 
     private DishCache() {
         this.cache = new ArrayList<>();
@@ -22,11 +22,11 @@ public class DishCache {
         return instance;
     }
 
-    public void addToCache(List<DishResponse> dishResponses) {
-        cache.addAll(dishResponses);
+    public void addToCache(List<DishDto> dishRespons) {
+        cache.addAll(dishRespons);
     }
 
-    public List<DishResponse> getCache() {
+    public List<DishDto> getCache() {
         return cache;
     }
 

@@ -13,6 +13,7 @@ public class PortionMapper {
     }
 
     public static Portion mapEntityToModel(final PortionEntity entity) {
+        if (entity == null) return null;
         return Portion.builder()
                 .id(entity.getId())
                 .externalId(entity.getExternalId())

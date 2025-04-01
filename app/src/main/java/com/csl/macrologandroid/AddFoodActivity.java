@@ -18,7 +18,7 @@ import com.csl.macrologandroid.cache.FoodCache;
 import com.csl.macrologandroid.dtos.FoodDto;
 import com.csl.macrologandroid.dtos.PortionDto;
 import com.csl.macrologandroid.lifecycle.Session;
-import com.csl.macrologandroid.services.FoodClient;
+import com.csl.macrologandroid.data.network.FoodClient;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 

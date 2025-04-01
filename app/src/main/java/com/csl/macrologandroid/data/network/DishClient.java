@@ -1,7 +1,7 @@
-package com.csl.macrologandroid.services;
+package com.csl.macrologandroid.data.network;
 
 import com.csl.macrologandroid.BuildConfig;
-import com.csl.macrologandroid.dtos.DishResponse;
+import com.csl.macrologandroid.dtos.DishDto;
 
 import java.util.List;
 
@@ -15,11 +15,11 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 
-public class DishService {
+public class DishClient {
 
     private final ApiService apiService;
 
-    public DishService(String token) {
+    public DishClient(String token) {
         OkHttpClient.Builder client = new OkHttpClient.Builder();
         client.addInterceptor(chain -> {
             Request original = chain.request();
@@ -40,20 +40,20 @@ public class DishService {
         apiService = retrofit.create(ApiService.class);
     }
 
-    public Observable<List<DishResponse>> getAllDishes() {
+    public Observable<List<DishDto>> getAllDishes() {
         return apiService.getAllDishes();
     }
 
-    public Observable<DishResponse> postDish(DishResponse dish) {
+    public Observable<DishDto> postDish(DishDto dish) {
         return apiService.postDish(dish);
     }
 
     private interface ApiService {
 
         @GET("dishes")
-        Observable<List<DishResponse>> getAllDishes();
+        Observable<List<DishDto>> getAllDishes();
 
         @POST("dishes")
-        Observable<DishResponse> postDish(@Body DishResponse dish);
+        Observable<DishDto> postDish(@Body DishDto dish);
     }
 }

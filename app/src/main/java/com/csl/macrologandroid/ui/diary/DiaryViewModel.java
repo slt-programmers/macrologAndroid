@@ -17,7 +17,7 @@ import com.csl.macrologandroid.dtos.UserSettingsResponse;
 import com.csl.macrologandroid.models.LogEntry;
 import com.csl.macrologandroid.models.Meal;
 import com.csl.macrologandroid.services.ActivityService;
-import com.csl.macrologandroid.services.LogEntryClient;
+import com.csl.macrologandroid.data.network.LogEntryClient;
 import com.csl.macrologandroid.services.UserService;
 
 import java.util.ArrayList;
@@ -80,7 +80,8 @@ public class DiaryViewModel extends AndroidViewModel {
         mLocalLogEntries = logEntryRepository.getMLogEntries();
         mActivities = new MutableLiveData<>();
         initUserSettings();
-        getLogEntries(selectedDate);
+        getLocalLogEntries(selectedDate);
+//        getLogEntries(selectedDate);
         getActivities(selectedDate);
     }
 
@@ -95,14 +96,16 @@ public class DiaryViewModel extends AndroidViewModel {
     public void loadNextDate() {
         final var time = selectedDate.getTime() + (1000 * 60 * 60 * 24);
         selectedDate = new Date(time);
-        getLogEntries(selectedDate);
+//        getLogEntries(selectedDate);
+        getLocalLogEntries(selectedDate);
         getActivities(selectedDate);
     }
 
     public void loadPreviousDate() {
         final var time = selectedDate.getTime() - (1000 * 60 * 60 * 24);
         selectedDate = new Date(time);
-        getLogEntries(selectedDate);
+//        getLogEntries(selectedDate);
+        getLocalLogEntries(selectedDate);
         getActivities(selectedDate);
     }
 
@@ -124,22 +127,22 @@ public class DiaryViewModel extends AndroidViewModel {
         }
     }
 
-    private void getLogEntries(final Date date) {
-        getLocalLogEntries(date);
-        final var logEntries = DiaryLogCache.getInstance().getFromCache(date);
-        if (logEntries == null || logEntries.isEmpty()) {
-            disposables.add(logEntryClient.getLogsForDay(date)
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(res -> {
-                        DiaryLogCache.getInstance().addToCache(date, res);
-                        sortEntriesAndSetTotals(res);
-                        mLogEntries.setValue(res);
-                    }, err -> Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage()))));
-        } else {
-            sortEntriesAndSetTotals(logEntries);
-            mLogEntries.setValue(logEntries);
-        }
-    }
+//    private void getLogEntries(final Date date) {
+//        getLocalLogEntries(date);
+//        final var logEntries = DiaryLogCache.getInstance().getFromCache(date);
+//        if (logEntries == null || logEntries.isEmpty()) {
+//            disposables.add(logEntryClient.getLogsForDay(date)
+//                    .observeOn(AndroidSchedulers.mainThread())
+//                    .subscribe(res -> {
+//                        DiaryLogCache.getInstance().addToCache(date, res);
+//                        sortEntriesAndSetTotals(res);
+//                        mLogEntries.setValue(res);
+//                    }, err -> Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage()))));
+//        } else {
+//            sortEntriesAndSetTotals(logEntries);
+//            mLogEntries.setValue(logEntries);
+//        }
+//    }
 
     private void getLocalLogEntries(final Date date) {
         logEntryRepository.getLogEntriesForDay(date);

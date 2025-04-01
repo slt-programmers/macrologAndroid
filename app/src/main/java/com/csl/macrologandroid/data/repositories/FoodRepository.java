@@ -10,11 +10,10 @@ import com.csl.macrologandroid.data.local.LocalDatabase;
 import com.csl.macrologandroid.data.local.daos.FoodDao;
 import com.csl.macrologandroid.data.local.daos.PortionDao;
 import com.csl.macrologandroid.data.models.FoodData;
-import com.csl.macrologandroid.dtos.FoodDto;
 import com.csl.macrologandroid.mappers.FoodMapper;
 import com.csl.macrologandroid.mappers.PortionMapper;
 import com.csl.macrologandroid.models.Food;
-import com.csl.macrologandroid.services.FoodClient;
+import com.csl.macrologandroid.data.network.FoodClient;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,7 +21,6 @@ import java.util.List;
 import java.util.Objects;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
 
 
@@ -54,36 +52,18 @@ public class FoodRepository {
             } else {
                 final var models = FoodMapper.mapDatasToModels(localFood);
                 mFood.postValue(models);
+                // TODO
 //                syncWithNetwork(localFood);
             }
         });
     }
 
-    public Observable<List<Food>> getAllObservableFood() {
-        return Observable.fromCallable(() -> {
-            final var localFood = foodDao.getAllFood();
-            return FoodMapper.mapDatasToModels(localFood);
-        }).flatMap(foodlist -> {
-            // TODO test
-            if (foodlist.isEmpty()) {
-                return foodClient.getAllFood().map((networkFood -> {
-                    final var allNewFoodData = cleanDatabaseAndReturnNewFoodData(networkFood);
-                    return FoodMapper.mapDatasToModels(allNewFoodData);
-                }));
-            } else {
-                return Observable.just(foodlist);
+    public void disposeAll() {
+        for (var disposable : disposables) {
+            if (!disposable.isDisposed()) {
+                disposable.dispose();
             }
-        }).observeOn(AndroidSchedulers.mainThread());
-    }
-
-    private List<FoodData> cleanDatabaseAndReturnNewFoodData(final List<FoodDto> networkFood) {
-        final var foodEntities = FoodMapper.mapDtosToEntities(networkFood);
-        final var portionEntities = networkFood.stream().map(foodDto -> PortionMapper.mapDtosToEntities(foodDto.getPortions(), foodDto.getId())).flatMap(Collection::stream).toList();
-        portionDao.deleteAll();
-        foodDao.deleteAll();
-        foodDao.insertAll(foodEntities);
-        portionDao.insertAll(portionEntities);
-        return foodDao.getAllFood();
+        }
     }
 
     private void fetchInsertAndSetFood() {
@@ -91,8 +71,8 @@ public class FoodRepository {
             final var foodEntities = FoodMapper.mapDtosToEntities(networkFood);
             final var portionEntities = networkFood.stream().map(foodDto -> PortionMapper.mapDtosToEntities(foodDto.getPortions(), foodDto.getId())).flatMap(Collection::stream).toList();
             LocalDatabase.databaseWriteExecutor.execute(() -> {
-                portionDao.deleteAll();
-                foodDao.deleteAll();
+//                portionDao.deleteAll();
+//                foodDao.deleteAll();
                 foodDao.insertAll(foodEntities);
                 portionDao.insertAll(portionEntities);
                 final var allNewFoodData = foodDao.getAllFood();

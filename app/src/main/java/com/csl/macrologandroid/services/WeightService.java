@@ -1,6 +1,7 @@
 package com.csl.macrologandroid.services;
 
 import com.csl.macrologandroid.BuildConfig;
+import com.csl.macrologandroid.data.network.CustomGsonConverter;
 import com.csl.macrologandroid.dtos.WeightRequest;
 
 import java.util.List;

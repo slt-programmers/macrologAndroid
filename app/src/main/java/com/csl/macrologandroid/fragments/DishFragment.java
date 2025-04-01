@@ -22,8 +22,8 @@ import com.csl.macrologandroid.DishActivity;
 import com.csl.macrologandroid.R;
 import com.csl.macrologandroid.adapters.DishListAdapter;
 import com.csl.macrologandroid.cache.DishCache;
-import com.csl.macrologandroid.dtos.DishResponse;
-import com.csl.macrologandroid.services.DishService;
+import com.csl.macrologandroid.dtos.DishDto;
+import com.csl.macrologandroid.data.network.DishClient;
 import com.csl.macrologandroid.util.KeyboardManager;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -41,8 +41,8 @@ import io.reactivex.rxjava3.disposables.Disposable;
 public class DishFragment extends Fragment {
 
     private Disposable dishDisposable;
-    private List<DishResponse> allDishes = new ArrayList<>();
-    private final List<DishResponse> searchedDishes = new ArrayList<>();
+    private List<DishDto> allDishes = new ArrayList<>();
+    private final List<DishDto> searchedDishes = new ArrayList<>();
 
     private DishListAdapter dishAdapter;
 
@@ -51,8 +51,8 @@ public class DishFragment extends Fragment {
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
                     DishCache.getInstance().clearCache();
-                    DishService dishService = new DishService(getToken());
-                    dishDisposable = dishService.getAllDishes()
+                    DishClient dishClient = new DishClient(getToken());
+                    dishDisposable = dishClient.getAllDishes()
                             .subscribe(res ->
                             {
                                 DishCache.getInstance().addToCache(res);
@@ -94,8 +94,8 @@ public class DishFragment extends Fragment {
             dishForResult.launch(intent);
         });
 
-        DishService dishService = new DishService(getToken());
-        dishDisposable = dishService.getAllDishes().subscribe(
+        DishClient dishClient = new DishClient(getToken());
+        dishDisposable = dishClient.getAllDishes().subscribe(
                 res ->
                 {
                     DishCache.getInstance().addToCache(res);
@@ -133,7 +133,7 @@ public class DishFragment extends Fragment {
             if (s == null || s.toString().isEmpty()) {
                 searchedDishes.addAll(allDishes);
             } else {
-                for (DishResponse dish : allDishes) {
+                for (DishDto dish : allDishes) {
                     if (dish.getName().toLowerCase().contains(s.toString().toLowerCase())) {
                         searchedDishes.add(dish);
                     }
@@ -148,7 +148,7 @@ public class DishFragment extends Fragment {
         }
     };
 
-    private void onEditClick(DishResponse dish) {
+    private void onEditClick(DishDto dish) {
         Intent intent = new Intent(this.getActivity(), DishActivity.class);
         intent.putExtra("DISH", dish);
         dishForResult.launch(intent);

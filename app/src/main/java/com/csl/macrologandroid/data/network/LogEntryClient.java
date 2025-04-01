@@ -1,4 +1,4 @@
-package com.csl.macrologandroid.services;
+package com.csl.macrologandroid.data.network;
 
 import com.csl.macrologandroid.BuildConfig;
 import com.csl.macrologandroid.dtos.LogEntryRequest;

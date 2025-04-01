@@ -12,16 +12,13 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-@Entity(tableName = "food", indices = {@Index(value = {"external_id"}, unique = true)})
-public class FoodEntity {
+@Entity(tableName = "dishes", indices = {@Index(value = {"external_id"}, unique = true)})
+public class DishEntity {
 
     @PrimaryKey(autoGenerate = true)
     private long id;
     @ColumnInfo(name = "external_id")
     private Long externalId;
     private String name;
-    private Double protein;
-    private Double fat;
-    private Double carbs;
 
 }

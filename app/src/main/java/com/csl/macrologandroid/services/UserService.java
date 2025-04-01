@@ -2,6 +2,7 @@ package com.csl.macrologandroid.services;
 
 import static com.csl.macrologandroid.BuildConfig.SERVER_URL;
 
+import com.csl.macrologandroid.data.network.CustomGsonConverter;
 import com.csl.macrologandroid.dtos.ConnectivityRequest;
 import com.csl.macrologandroid.dtos.ConnectivityResponse;
 import com.csl.macrologandroid.dtos.SettingsResponse;

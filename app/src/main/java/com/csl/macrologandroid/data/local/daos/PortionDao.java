@@ -14,7 +14,7 @@ public interface PortionDao {
     @Insert
     void insertAll(final List<PortionEntity> entities);
 
-    @Query("DELETE FROM portions")
+    @Query("delete from portions")
     void deleteAll();
 
 }

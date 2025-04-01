@@ -9,14 +9,14 @@ import android.widget.Spinner;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.csl.macrologandroid.dtos.DishResponse;
+import com.csl.macrologandroid.dtos.DishDto;
 import com.csl.macrologandroid.dtos.FoodDto;
 import com.csl.macrologandroid.dtos.LogEntryResponse;
 import com.csl.macrologandroid.lifecycle.Session;
 import com.csl.macrologandroid.models.Meal;
-import com.csl.macrologandroid.services.DishService;
-import com.csl.macrologandroid.services.FoodClient;
-import com.csl.macrologandroid.services.LogEntryClient;
+import com.csl.macrologandroid.data.network.DishClient;
+import com.csl.macrologandroid.data.network.FoodClient;
+import com.csl.macrologandroid.data.network.LogEntryClient;
 import com.csl.macrologandroid.ui.diary.EditDiaryFragment;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -30,10 +30,10 @@ public class EditEntryActivity extends AppCompatActivity {
     private Date selectedDate;
     private LogEntryClient logEntryClient;
     private FoodClient foodClient;
-    private DishService dishService;
+    private DishClient dishClient;
 
     private List<FoodDto> allFood;
-    private List<DishResponse> allDishes;
+    private List<DishDto> allDishes;
 
     private final List<String> autoCompleteList = new ArrayList<>();
 

@@ -3,13 +3,13 @@ package com.csl.macrologandroid.dtos;
 import java.io.Serializable;
 import java.util.List;
 
-public class DishResponse implements Serializable {
+public class DishDto implements Serializable {
 
     private Long id;
     private final String name;
-    private final List<IngredientResponse> ingredients;
+    private final List<IngredientDto> ingredients;
 
-    public DishResponse(Long id, String name, List<IngredientResponse> ingredients) {
+    public DishDto(Long id, String name, List<IngredientDto> ingredients) {
         this.id = id;
         this.name = name;
         this.ingredients = ingredients;
@@ -27,7 +27,7 @@ public class DishResponse implements Serializable {
         return name;
     }
 
-    public List<IngredientResponse> getIngredients() {
+    public List<IngredientDto> getIngredients() {
         return ingredients;
     }
 

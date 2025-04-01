@@ -22,16 +22,20 @@ import io.reactivex.rxjava3.core.Single;
 public interface FoodDao {
 
     @Transaction
-    @Query("SELECT * FROM food")
+    @Query("select * from food")
     List<FoodData> getAllFood();
 
+    @Transaction
+    @Query("select * from food where external_id in (:externalIds)")
+    List<FoodData> getByExternalIds(final List<Long> externalIds);
+
     @Insert
-    void insertAll(List<FoodEntity> entities);
+    void insertAll(final List<FoodEntity> entities);
 
     @Insert
     long insert(final FoodEntity entity);
 
-    @Query("DELETE FROM food")
+    @Query("delete from food")
     void deleteAll();
 
 }
