@@ -1,5 +1,7 @@
 package com.csl.macrologandroid.data.network;
 
+import android.content.Context;
+
 import com.csl.macrologandroid.BuildConfig;
 import com.csl.macrologandroid.dtos.DishDto;
 
@@ -13,47 +15,44 @@ import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
 
 public class DishClient {
 
     private final ApiService apiService;
+    private final Context context;
 
-    public DishClient(String token) {
-        OkHttpClient.Builder client = new OkHttpClient.Builder();
-        client.addInterceptor(chain -> {
-            Request original = chain.request();
-            Request request = original.newBuilder()
-                    .header("Authorization", "Bearer " + token)
-                    .method(original.method(), original.body())
-                    .build();
-            return chain.proceed(request);
-        });
-
-        Retrofit retrofit = new Retrofit.Builder()
+    public DishClient(final Context context) {
+        this.context = context;
+        final var retrofit = new Retrofit.Builder()
                 .baseUrl(BuildConfig.SERVER_URL)
-                .client(client.build())
+                .client(new OkHttpClient.Builder().build())
                 .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
-
         apiService = retrofit.create(ApiService.class);
     }
 
     public Observable<List<DishDto>> getAllDishes() {
-        return apiService.getAllDishes();
+        return apiService.getAllDishes(getToken());
     }
 
     public Observable<DishDto> postDish(DishDto dish) {
-        return apiService.postDish(dish);
+        return apiService.postDish(getToken(), dish);
+    }
+
+    private String getToken() {
+        final var token = context.getSharedPreferences("AUTH", Context.MODE_PRIVATE).getString("TOKEN", null);
+        return "Bearer " + token;
     }
 
     private interface ApiService {
 
         @GET("dishes")
-        Observable<List<DishDto>> getAllDishes();
+        Observable<List<DishDto>> getAllDishes(@Header("Authorization") String token);
 
         @POST("dishes")
-        Observable<DishDto> postDish(@Body DishDto dish);
+        Observable<DishDto> postDish(@Header("Authorization") String token, @Body DishDto dish);
     }
 }

@@ -1,13 +1,12 @@
 package com.csl.macrologandroid.mappers;
 
-import android.util.Log;
-
 import com.csl.macrologandroid.data.local.entities.LogEntryEntity;
 import com.csl.macrologandroid.data.models.FoodData;
 import com.csl.macrologandroid.data.models.LogEntryData;
 import com.csl.macrologandroid.dtos.LogEntryRequest;
 import com.csl.macrologandroid.dtos.LogEntryResponse;
 import com.csl.macrologandroid.models.LogEntry;
+import com.csl.macrologandroid.models.Meal;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,7 +39,9 @@ public class LogEntryMapper {
 
     public static LogEntryEntity mapResponseToEntity(final LogEntryResponse response, final FoodData foodData) {
         final var portionExternalId = response.getPortion() != null ? response.getPortion().getId() : null;
-        final var portionEntity = portionExternalId != null ? foodData.portionEntities.stream().filter(p -> portionExternalId.equals(p.getExternalId())).toList().get(0) : null;
+        final var portionEntity = portionExternalId != null ? foodData.portionEntities.stream()
+                .filter(p -> portionExternalId.equals(p.getExternalId()))
+                .toList().get(0) : null;
         return LogEntryEntity.builder()
                 .externalId((long) response.getId())
                 .day(FORMAT.format(response.getDay()))
@@ -61,13 +62,16 @@ public class LogEntryMapper {
     public static LogEntry mapDataToModel(final LogEntryData data) {
         final var food = FoodMapper.mapEntityToModel(data.foodForEntity, data.portionsForFood);
         final var portion = PortionMapper.mapEntityToModel(data.portionForEntity);
+        final var multiplier = data.logEntryEntity.getMultiplier();
         return LogEntry.builder()
                 .id(data.logEntryEntity.getId())
                 .externalId(data.logEntryEntity.getExternalId())
                 .day(data.logEntryEntity.getDay())
-                .meal(data.logEntryEntity.getMeal())
+                .meal(Meal.valueOf(data.logEntryEntity.getMeal()))
                 .food(food)
                 .portion(portion)
+                .multiplier(multiplier)
+                .macros(MacrosMapper.mapMacros(food, portion, multiplier))
                 .build();
     }
 

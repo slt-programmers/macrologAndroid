@@ -7,17 +7,14 @@ import android.util.Log;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
-import com.csl.macrologandroid.cache.DiaryLogCache;
 import com.csl.macrologandroid.cache.UserSettingsCache;
 import com.csl.macrologandroid.data.repositories.LogEntryRepository;
 import com.csl.macrologandroid.dtos.ActivityResponse;
-import com.csl.macrologandroid.dtos.LogEntryResponse;
-import com.csl.macrologandroid.dtos.MacrosResponse;
 import com.csl.macrologandroid.dtos.UserSettingsResponse;
 import com.csl.macrologandroid.models.LogEntry;
+import com.csl.macrologandroid.models.Macros;
 import com.csl.macrologandroid.models.Meal;
 import com.csl.macrologandroid.services.ActivityService;
-import com.csl.macrologandroid.data.network.LogEntryClient;
 import com.csl.macrologandroid.services.UserService;
 
 import java.util.ArrayList;
@@ -34,25 +31,24 @@ public class DiaryViewModel extends AndroidViewModel {
 
     private final UserService userService;
     private final LogEntryRepository logEntryRepository;
-    private final LogEntryClient logEntryClient;
     private final ActivityService activityService;
 
     @Getter
     private final MutableLiveData<UserSettingsResponse> mUserSettings;
     @Getter
-    private final MutableLiveData<List<LogEntryResponse>> mLogEntries;
+    private final MutableLiveData<List<LogEntry>> mLogEntries;
     @Getter
     private final MutableLiveData<List<LogEntry>> mLocalLogEntries;
     @Getter
     private final MutableLiveData<List<ActivityResponse>> mActivities;
     @Getter
-    private final List<LogEntryResponse> breakfastEntries = new ArrayList<>();
+    private final List<LogEntry> breakfastEntries = new ArrayList<>();
     @Getter
-    private final List<LogEntryResponse> lunchEntries = new ArrayList<>();
+    private final List<LogEntry> lunchEntries = new ArrayList<>();
     @Getter
-    private final List<LogEntryResponse> dinnerEntries = new ArrayList<>();
+    private final List<LogEntry> dinnerEntries = new ArrayList<>();
     @Getter
-    private final List<LogEntryResponse> snacksEntries = new ArrayList<>();
+    private final List<LogEntry> snacksEntries = new ArrayList<>();
     @Getter
     private double totalProtein;
     @Getter
@@ -73,7 +69,6 @@ public class DiaryViewModel extends AndroidViewModel {
         final var token = application.getApplicationContext().getSharedPreferences("AUTH", Context.MODE_PRIVATE).getString("TOKEN", null);
         this.userService = new UserService(token);
         this.logEntryRepository = new LogEntryRepository(application);
-        this.logEntryClient = new LogEntryClient(token);
         this.activityService = new ActivityService(token);
         mUserSettings = new MutableLiveData<>();
         mLogEntries = new MutableLiveData<>();
@@ -127,31 +122,18 @@ public class DiaryViewModel extends AndroidViewModel {
         }
     }
 
-//    private void getLogEntries(final Date date) {
-//        getLocalLogEntries(date);
-//        final var logEntries = DiaryLogCache.getInstance().getFromCache(date);
-//        if (logEntries == null || logEntries.isEmpty()) {
-//            disposables.add(logEntryClient.getLogsForDay(date)
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .subscribe(res -> {
-//                        DiaryLogCache.getInstance().addToCache(date, res);
-//                        sortEntriesAndSetTotals(res);
-//                        mLogEntries.setValue(res);
-//                    }, err -> Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage()))));
-//        } else {
-//            sortEntriesAndSetTotals(logEntries);
-//            mLogEntries.setValue(logEntries);
-//        }
-//    }
-
     private void getLocalLogEntries(final Date date) {
+        logEntryRepository.getMLogEntries().observeForever(logEntries -> {
+            sortEntriesAndSetTotals(logEntries);
+            mLogEntries.setValue(logEntries);
+        });
         logEntryRepository.getLogEntriesForDay(date);
     }
 
-    private void sortEntriesAndSetTotals(final List<LogEntryResponse> logEntries) {
+    private void sortEntriesAndSetTotals(final List<LogEntry> logEntries) {
         resetAllState();
-        for (LogEntryResponse logEntry : logEntries) {
-            final var macros = logEntry.getMacrosCalculated();
+        for (var logEntry : logEntries) {
+            final var macros = logEntry.getMacros();
             addMacros(macros);
 
             if (logEntry.getMeal() == Meal.BREAKFAST) {
@@ -167,7 +149,7 @@ public class DiaryViewModel extends AndroidViewModel {
         totalCalories = (int) ((totalProtein * 4) + (totalFat * 9) + (totalCarbs * 4));
     }
 
-    private void addMacros(final MacrosResponse macros) {
+    private void addMacros(final Macros macros) {
         totalProtein += macros.getProtein();
         totalFat += macros.getFat();
         totalCarbs += macros.getCarbs();

@@ -23,6 +23,7 @@ import com.csl.macrologandroid.databinding.FragmentDiaryBinding;
 import com.csl.macrologandroid.dtos.ActivityResponse;
 import com.csl.macrologandroid.dtos.LogEntryResponse;
 import com.csl.macrologandroid.dtos.UserSettingsResponse;
+import com.csl.macrologandroid.models.LogEntry;
 import com.csl.macrologandroid.models.Meal;
 
 import java.text.SimpleDateFormat;
@@ -142,11 +143,11 @@ public class DiaryFragment extends Fragment {
         }
     }
 
-    private void fillCard(final LinearLayout cardEntriesLayout, final List<LogEntryResponse> entries) {
+    private void fillCard(final LinearLayout cardEntriesLayout, final List<LogEntry> entries) {
         cardEntriesLayout.removeAllViews();
         if (!entries.isEmpty()) {
             addEntryCardHeader(cardEntriesLayout);
-            for (LogEntryResponse entry : entries) {
+            for (var entry : entries) {
                 addEntryToTable(cardEntriesLayout, entry);
             }
         } else {
@@ -252,13 +253,13 @@ public class DiaryFragment extends Fragment {
         layout.addView(header);
     }
 
-    private void addEntryToTable(final LinearLayout layout, final LogEntryResponse entry) {
+    private void addEntryToTable(final LinearLayout layout, final LogEntry entry) {
         final var row = getLayoutInflater().inflate(R.layout.layout_entry_card_row, null);
         ((TextView) row.findViewById(R.id.food_name)).setText(entry.getFood().getName());
-        ((TextView) row.findViewById(R.id.food_protein)).setText(String.format(Locale.ENGLISH, "%.1f", entry.getMacrosCalculated().getProtein()));
-        ((TextView) row.findViewById(R.id.food_fat)).setText(String.format(Locale.ENGLISH, "%.1f", entry.getMacrosCalculated().getFat()));
-        ((TextView) row.findViewById(R.id.food_carbs)).setText(String.format(Locale.ENGLISH, "%.1f", entry.getMacrosCalculated().getCarbs()));
-        ((TextView) row.findViewById(R.id.food_kcal)).setText(String.format(Locale.ENGLISH, "%1.0f", entry.getMacrosCalculated().getCalories()));
+        ((TextView) row.findViewById(R.id.food_protein)).setText(String.format(Locale.ENGLISH, "%.1f", entry.getMacros().getProtein()));
+        ((TextView) row.findViewById(R.id.food_fat)).setText(String.format(Locale.ENGLISH, "%.1f", entry.getMacros().getFat()));
+        ((TextView) row.findViewById(R.id.food_carbs)).setText(String.format(Locale.ENGLISH, "%.1f", entry.getMacros().getCarbs()));
+        ((TextView) row.findViewById(R.id.food_kcal)).setText(String.format(Locale.ENGLISH, "%1.0f", entry.getMacros().getCalories()));
         layout.addView(row);
     }
 

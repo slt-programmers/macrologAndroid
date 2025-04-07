@@ -190,7 +190,7 @@ public class FoodFragment extends Fragment {
 
     private void refreshAllFood() {
         FoodCache.getInstance().clearCache();
-        FoodClient foodClient = new FoodClient(getToken());
+        FoodClient foodClient = new FoodClient(getContext());
         disposable = foodClient.getAllFood()
                 .subscribe(res ->
                 {

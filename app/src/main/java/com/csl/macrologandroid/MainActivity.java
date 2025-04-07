@@ -3,6 +3,7 @@ package com.csl.macrologandroid;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,6 +16,7 @@ import com.csl.macrologandroid.cache.DiaryLogCache;
 import com.csl.macrologandroid.cache.FoodCache;
 import com.csl.macrologandroid.cache.UserSettingsCache;
 import com.csl.macrologandroid.databinding.ActivityMainBinding;
+import com.csl.macrologandroid.services.SyncService;
 import com.csl.macrologandroid.ui.diary.DiaryFragment;
 import com.csl.macrologandroid.fragments.DishFragment;
 import com.csl.macrologandroid.fragments.FoodFragment;
@@ -31,15 +33,15 @@ public class MainActivity extends AppCompatActivity implements UserFragment.OnLo
     private BottomNavigationView navigation;
 
     private ActivityMainBinding binding;
+    private SyncService syncService;
 
     private final ActivityResultLauncher<Intent> loginRegisterForResult =
             registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                     result -> {
                         if (result.getResultCode() == Activity.RESULT_OK) {
-                            FoodCache.getInstance().clearCache();
-                            DiaryLogCache.getInstance().clearCache();
-                            ActivityCache.getInstance().clearCache();
-                            navigation.setSelectedItemId(R.id.navigation_diary);
+                            syncService.syncNetworkWithLocalData().observe(this, synced -> {
+                                if (synced) navigation.setSelectedItemId(R.id.navigation_diary);
+                            });
                         }
                     });
 
@@ -66,16 +68,20 @@ public class MainActivity extends AppCompatActivity implements UserFragment.OnLo
     };
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        syncService = new SyncService(getApplication());
         setContentView(R.layout.activity_main);
         NotificationSender.initNotificationSending(getApplicationContext());
-        setFragment(new DiaryFragment());
         navigation = findViewById(R.id.navigation);
         navigation.setOnItemSelectedListener(mOnNavigationItemSelectedListener);
 
         if (!isLoggedIn()) {
             loginRegisterForResult.launch(new Intent(this, LoginActivity.class));
+        } else {
+            syncService.syncNetworkWithLocalData().observe(this, synced -> {
+                if (synced) setFragment(new DiaryFragment());
+            });
         }
     }
 

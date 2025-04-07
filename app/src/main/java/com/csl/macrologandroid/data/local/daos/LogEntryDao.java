@@ -21,7 +21,7 @@ public interface LogEntryDao {
 
     @Transaction
     @Query("select * from logentries where day = :date and meal = :meal")
-    LiveData<List<LogEntryData>> getLogEntriesByDateAndMeal(final String date, final String meal);
+    List<LogEntryData> getLogEntriesByDateAndMeal(final String date, final String meal);
 
     @Insert
     void insertAll(final List<LogEntryEntity> logEntryEntities);

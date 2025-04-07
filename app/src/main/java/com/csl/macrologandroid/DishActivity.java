@@ -76,7 +76,7 @@ public class DishActivity extends AppCompatActivity {
         searchFoodTextView = findViewById(R.id.search_food);
         allFood = FoodCache.getInstance().getCache();
         if (allFood.size() == 0) {
-            FoodClient foodClient = new FoodClient(getToken());
+            FoodClient foodClient = new FoodClient(getApplicationContext());
             foodDisposable = foodClient.getAllFood().subscribe(res -> {
                         allFood = res;
                         autoCompleteList.clear();
@@ -255,7 +255,7 @@ public class DishActivity extends AppCompatActivity {
         }
 
         DishDto newDish = new DishDto(dishId, dishName, newIngredients);
-        DishClient dishClient = new DishClient(getToken());
+        DishClient dishClient = new DishClient(getApplicationContext());
         disposable = dishClient.postDish(newDish)
                 .subscribe(res -> {
                     Intent resultIntent = new Intent();

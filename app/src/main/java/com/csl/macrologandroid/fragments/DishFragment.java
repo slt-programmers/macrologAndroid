@@ -32,6 +32,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static android.content.Context.MODE_PRIVATE;
 import static android.view.KeyEvent.KEYCODE_ENTER;
@@ -51,7 +52,7 @@ public class DishFragment extends Fragment {
             result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
                     DishCache.getInstance().clearCache();
-                    DishClient dishClient = new DishClient(getToken());
+                    DishClient dishClient = new DishClient(requireActivity().getApplicationContext());
                     dishDisposable = dishClient.getAllDishes()
                             .subscribe(res ->
                             {
@@ -94,7 +95,7 @@ public class DishFragment extends Fragment {
             dishForResult.launch(intent);
         });
 
-        DishClient dishClient = new DishClient(getToken());
+        DishClient dishClient = new DishClient(requireActivity().getApplicationContext());
         dishDisposable = dishClient.getAllDishes().subscribe(
                 res ->
                 {
@@ -162,10 +163,5 @@ public class DishFragment extends Fragment {
         }
         return false;
     };
-
-    private String getToken() {
-        return this.requireContext().getSharedPreferences("AUTH", MODE_PRIVATE).getString("TOKEN", "");
-    }
-
 
 }

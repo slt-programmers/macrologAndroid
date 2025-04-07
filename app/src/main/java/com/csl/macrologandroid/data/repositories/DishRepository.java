@@ -1,7 +1,6 @@
 package com.csl.macrologandroid.data.repositories;
 
 import android.app.Application;
-import android.content.Context;
 import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
@@ -11,7 +10,6 @@ import com.csl.macrologandroid.data.local.daos.DishDao;
 import com.csl.macrologandroid.data.local.daos.IngredientDao;
 import com.csl.macrologandroid.data.network.DishClient;
 import com.csl.macrologandroid.mappers.DishMapper;
-import com.csl.macrologandroid.mappers.FoodMapper;
 import com.csl.macrologandroid.mappers.IngredientMapper;
 import com.csl.macrologandroid.models.Dish;
 
@@ -26,51 +24,56 @@ import lombok.Getter;
 
 public class DishRepository {
 
+    // Local
     private final DishDao dishDao;
     private final IngredientDao ingredientDao;
-    private final DishClient dishClient;
     @Getter
     private final MutableLiveData<List<Dish>> mDishes = new MutableLiveData<>();
+
+    // Network
+    private final DishClient dishClient;
     private final List<Disposable> disposables = new ArrayList<>();
+    @Getter
+    private final MutableLiveData<Boolean> mSynced = new MutableLiveData<>(false);
 
     public DishRepository(final Application application) {
         final var db = LocalDatabase.getDatabase(application.getApplicationContext());
         dishDao = db.dishDao();
         ingredientDao = db.ingredientDao();
-        final var token = application.getApplicationContext().getSharedPreferences("AUTH", Context.MODE_PRIVATE).getString("TOKEN", null);
-        dishClient = new DishClient(token);
+        dishClient = new DishClient(application.getApplicationContext());
     }
 
     public void getAllDishes() {
         LocalDatabase.databaseWriteExecutor.execute(() -> {
             final var localDishes = dishDao.getAllDishes();
-            if (localDishes == null || localDishes.isEmpty()) {
-                fetchInsertAndSetFood();
-            } else {
-                final var models = DishMapper.mapDatasToModels(localDishes);
-                mDishes.postValue(models);
-//                syncWithNetwork(localFood);
-            }
+            final var models = DishMapper.mapDatasToModels(localDishes);
+            mDishes.postValue(models);
         });
     }
 
-    private void fetchInsertAndSetFood() {
+    public void getNetworkDishes() {
         disposables.add(dishClient.getAllDishes().observeOn(AndroidSchedulers.mainThread()).subscribe(networkDishes -> {
-            final var dishEntities = DishMapper.mapDtosToEntities(networkDishes);
-            final var ingredientEntities = networkDishes.stream().map(dishDto -> IngredientMapper.mapDtosToEntities(dishDto.getIngredients(),
-                    dishDto.getId())).flatMap(Collection::stream).toList();
             LocalDatabase.databaseWriteExecutor.execute(() -> {
-                ingredientDao.deleteAll();
-                dishDao.deleteAll();
+                final var dishEntities = DishMapper.mapDtosToEntities(networkDishes);
                 dishDao.insertAll(dishEntities);
+                final var newDishes = dishDao.getAllDishes();
+                final var ingredientEntities = networkDishes.stream()
+                        .map(dishDto -> {
+                            final var dishData = newDishes.stream().filter(data -> data.dishEntity.getExternalId().equals(dishDto.getId())).toList().get(0);
+                            return IngredientMapper.mapDtosToEntities(dishDto.getIngredients(), dishData.dishEntity.getId());
+                        })
+                        .flatMap(Collection::stream).toList();
                 ingredientDao.insertAll(ingredientEntities);
-                final var allNewDishData = dishDao.getAllDishes();
-                final var dates = DishMapper.mapDatasToModels(allNewDishData);
-                mDishes.postValue(dates);
+                mSynced.postValue(true);
             });
         }, err -> {
             Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage()));
         }));
     }
 
+    public void disposeAll() {
+        for (var disposable : disposables) {
+            if (!disposable.isDisposed()) disposable.dispose();
+        }
+    }
 }

@@ -8,8 +8,6 @@ import androidx.lifecycle.MutableLiveData;
 import com.csl.macrologandroid.data.repositories.DishRepository;
 import com.csl.macrologandroid.data.repositories.FoodRepository;
 import com.csl.macrologandroid.data.repositories.LogEntryRepository;
-import com.csl.macrologandroid.dtos.DishDto;
-import com.csl.macrologandroid.mappers.IngredientResponseToLogEntryResponseMapper;
 import com.csl.macrologandroid.models.Dish;
 import com.csl.macrologandroid.models.Food;
 import com.csl.macrologandroid.models.LogEntry;
@@ -21,7 +19,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import lombok.Getter;
 import lombok.Setter;
@@ -119,7 +116,7 @@ public class EditDiaryViewModel extends AndroidViewModel {
                 .portion(optionalPortion.orElse(null))
                 .multiplier(multiplier)
                 .day(DateUtil.format(selectedDate))
-                .meal(selectedMeal.name()).build();
+                .meal(selectedMeal).build();
 
         final var logEntries = new ArrayList<>(mLogEntries.getValue());
         logEntries.add(entry);
@@ -151,12 +148,12 @@ public class EditDiaryViewModel extends AndroidViewModel {
     }
 
     private void getFood() {
-        mAllFood = foodRepository.getMAllFood();
+        mAllFood = foodRepository.getMFood();
         mAllFood.observeForever(food -> {
             allFood = food;
             combineFoodAndDishesSearchList();
         });
-        foodRepository.getAllFood();
+        foodRepository.getFood();
     }
 
     private void getDishes() {

@@ -201,7 +201,7 @@ public class AddFoodActivity extends AppCompatActivity {
         if (foodDto != null) {
             newFood.setId(foodDto.getId());
         }
-        FoodClient foodClient = new FoodClient(getToken());
+        FoodClient foodClient = new FoodClient(getApplicationContext());
         disposable = foodClient.postFood(newFood)
                 .subscribe(res -> {
                     Intent resultIntent = new Intent();

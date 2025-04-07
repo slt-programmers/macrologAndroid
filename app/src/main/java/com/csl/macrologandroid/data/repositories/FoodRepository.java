@@ -1,7 +1,6 @@
 package com.csl.macrologandroid.data.repositories;
 
 import android.app.Application;
-import android.content.Context;
 import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
@@ -9,7 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.csl.macrologandroid.data.local.LocalDatabase;
 import com.csl.macrologandroid.data.local.daos.FoodDao;
 import com.csl.macrologandroid.data.local.daos.PortionDao;
-import com.csl.macrologandroid.data.models.FoodData;
+import com.csl.macrologandroid.dtos.FoodDto;
 import com.csl.macrologandroid.mappers.FoodMapper;
 import com.csl.macrologandroid.mappers.PortionMapper;
 import com.csl.macrologandroid.models.Food;
@@ -22,39 +21,34 @@ import java.util.Objects;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.disposables.Disposable;
-
+import lombok.Getter;
 
 public class FoodRepository {
 
+    // Local
     private final FoodDao foodDao;
     private final PortionDao portionDao;
-    private final FoodClient foodClient;
+    @Getter
     private final MutableLiveData<List<Food>> mFood = new MutableLiveData<>();
+
+    // Network
+    private final FoodClient foodClient;
     private final List<Disposable> disposables = new ArrayList<>();
+    @Getter
+    private final MutableLiveData<Boolean> mSynced = new MutableLiveData<>(false);
 
     public FoodRepository(final Application application) {
         final var db = LocalDatabase.getDatabase(application.getApplicationContext());
         foodDao = db.foodDao();
         portionDao = db.portionDao();
-        final var token = application.getApplicationContext().getSharedPreferences("AUTH", Context.MODE_PRIVATE).getString("TOKEN", null);
-        foodClient = new FoodClient(token);
+        foodClient = new FoodClient(application.getApplicationContext());
     }
 
-    public MutableLiveData<List<Food>> getMAllFood() {
-        return mFood;
-    }
-
-    public void getAllFood() {
+    public void getFood() {
         LocalDatabase.databaseWriteExecutor.execute(() -> {
             final var localFood = foodDao.getAllFood();
-            if (localFood == null || localFood.isEmpty()) {
-                fetchInsertAndSetFood();
-            } else {
-                final var models = FoodMapper.mapDatasToModels(localFood);
-                mFood.postValue(models);
-                // TODO
-//                syncWithNetwork(localFood);
-            }
+            final var models = FoodMapper.mapDatasToModels(localFood);
+            mFood.postValue(models);
         });
     }
 
@@ -66,30 +60,28 @@ public class FoodRepository {
         }
     }
 
-    private void fetchInsertAndSetFood() {
+    public void getNetworkFood() {
         disposables.add(foodClient.getAllFood().observeOn(AndroidSchedulers.mainThread()).subscribe(networkFood -> {
-            final var foodEntities = FoodMapper.mapDtosToEntities(networkFood);
-            final var portionEntities = networkFood.stream().map(foodDto -> PortionMapper.mapDtosToEntities(foodDto.getPortions(), foodDto.getId())).flatMap(Collection::stream).toList();
             LocalDatabase.databaseWriteExecutor.execute(() -> {
-//                portionDao.deleteAll();
-//                foodDao.deleteAll();
-                foodDao.insertAll(foodEntities);
-                portionDao.insertAll(portionEntities);
-                final var allNewFoodData = foodDao.getAllFood();
-                final var dates = FoodMapper.mapDatasToModels(allNewFoodData);
-                mFood.postValue(dates);
+                insertFoodAndPortions(networkFood);
+                mSynced.postValue(true);
             });
         }, err -> {
             Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage()));
         }));
     }
 
-    private void syncWithNetwork(final List<FoodData> food) {
-        final var newFood = food.stream().filter(f -> f.foodEntity.getExternalId() == null).toList();
-        newFood.forEach(f -> {
-            disposables.add(foodClient.postFood(FoodMapper.mapDataToDto(f)).observeOn(AndroidSchedulers.mainThread()).subscribe((res) -> {
-            }, err -> Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage()))));
-        });
-        // TODO changed food
+    private void insertFoodAndPortions(final List<FoodDto> foodDtos) {
+        final var foodEntities = FoodMapper.mapDtosToEntities(foodDtos);
+        foodDao.insertAll(foodEntities);
+        final var newFoodEntities = foodDao.getAllFood();
+        final var portionEntities = foodDtos.stream()
+                .map(foodDto -> {
+                    final var food = newFoodEntities.stream().filter(foodData -> foodData.foodEntity.getExternalId().equals(foodDto.getId())).toList().get(0);
+                    return PortionMapper.mapDtosToEntities(foodDto.getPortions(), food.foodEntity.getId());
+                })
+                .flatMap(Collection::stream).toList();
+        portionDao.insertAll(portionEntities);
     }
+
 }

@@ -1,5 +1,7 @@
 package com.csl.macrologandroid.models;
 
+import com.csl.macrologandroid.dtos.MacrosResponse;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,6 +21,7 @@ public class LogEntry {
     @Setter
     private Double multiplier;
     private final String day;
-    private final String meal;
+    private final Meal meal;
+    private final Macros macros;
 
 }

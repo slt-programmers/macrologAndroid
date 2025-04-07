@@ -1,7 +1,6 @@
 package com.csl.macrologandroid.data.repositories;
 
 import android.app.Application;
-import android.content.Context;
 import android.util.Log;
 
 import androidx.lifecycle.MutableLiveData;
@@ -9,9 +8,6 @@ import androidx.lifecycle.MutableLiveData;
 import com.csl.macrologandroid.data.local.LocalDatabase;
 import com.csl.macrologandroid.data.local.daos.FoodDao;
 import com.csl.macrologandroid.data.local.daos.LogEntryDao;
-import com.csl.macrologandroid.data.models.LogEntryData;
-import com.csl.macrologandroid.dtos.FoodDto;
-import com.csl.macrologandroid.dtos.LogEntryResponse;
 import com.csl.macrologandroid.mappers.LogEntryMapper;
 import com.csl.macrologandroid.models.LogEntry;
 import com.csl.macrologandroid.models.Meal;
@@ -29,50 +25,38 @@ import lombok.Getter;
 
 public class LogEntryRepository {
 
+    // Local
     private final LogEntryDao logEntryDao;
     private final FoodDao foodDao;
-    private final LogEntryClient logEntryClient;
     @Getter
     private final MutableLiveData<List<LogEntry>> mLogEntries = new MutableLiveData<>();
     @Getter
     private final MutableLiveData<List<LogEntry>> mEditLogEntries = new MutableLiveData<>();
+
+    // Network
+    private final LogEntryClient logEntryClient;
     private final List<Disposable> disposables = new ArrayList<>();
+    @Getter
+    private final MutableLiveData<Boolean> mSynced = new MutableLiveData<>(false);
 
     public LogEntryRepository(final Application application) {
         final var db = LocalDatabase.getDatabase(application.getApplicationContext());
         logEntryDao = db.logEntryDao();
         foodDao = db.foodDao();
-        final var token = application.getApplicationContext().getSharedPreferences("AUTH", Context.MODE_PRIVATE).getString("TOKEN", null);
-        logEntryClient = new LogEntryClient(token);
+        logEntryClient = new LogEntryClient(application.getApplicationContext());
     }
-
-    // -- Offline first design --
-
-    // Check if local has entries for day
-    // If local has entries -> sync local with network, local being leading
-    // If not -> Check if network has entries for day
-    // If network has entries for day -> sync network with local
-
-    // starting
-    // no entries -> fetch -> logentryresponses
-
-    // Model <--> Data/Entity <--> Responses
 
     public void getLogEntriesForDay(final Date date) {
         LocalDatabase.databaseWriteExecutor.execute(() -> {
             final var localLogEntries = logEntryDao.getByDate(DateUtil.format(date));
-            if (localLogEntries == null || localLogEntries.isEmpty()) {
-                fetchInsertAndSetLogEntries(date);
-            } else {
-                setAndSyncLogEntries(date, localLogEntries);
-            }
+            final var models = LogEntryMapper.mapDatasToModels(localLogEntries);
+            mLogEntries.postValue(models);
         });
     }
 
     public void getLogEntriesForDayAndMeal(final Date date, final Meal meal) {
         LocalDatabase.databaseWriteExecutor.execute(() -> {
-            final var liveDataLogEntries = logEntryDao.getLogEntriesByDateAndMeal(DateUtil.format(date), meal.name());
-            final var datas = liveDataLogEntries.getValue();
+            final var datas = logEntryDao.getLogEntriesByDateAndMeal(DateUtil.format(date), meal.name());
             final var models = LogEntryMapper.mapDatasToModels(datas);
             mEditLogEntries.postValue(models);
         });
@@ -86,29 +70,25 @@ public class LogEntryRepository {
         });
     }
 
-    private void fetchInsertAndSetLogEntries(final Date date) {
-        disposables.add(logEntryClient.getLogsForDay(date).observeOn(AndroidSchedulers.mainThread()).subscribe(networkLogEntries -> {
-            LocalDatabase.databaseWriteExecutor.execute(() -> {
-                final var foodExteranlIds = networkLogEntries.stream().map(logEntryResponse -> logEntryResponse.getFood().getId()).toList();
-                final var foodData = foodDao.getByExternalIds(foodExteranlIds);
-                final var entities = LogEntryMapper.mapResponsesToEntities(networkLogEntries, foodData);
+    public void getNetworkLogEntries(final Date date) {
+        final var sevenDaysAgo = new Date(new Date().getTime() - (7 * 1000 * 60 * 60 * 24));
+        if (sevenDaysAgo.before(date)) {
+            disposables.add(logEntryClient.getLogsForDay(date).observeOn(AndroidSchedulers.mainThread()).subscribe(networkLogEntries -> {
+                LocalDatabase.databaseWriteExecutor.execute(() -> {
+                    final var foodExteranlIds = networkLogEntries.stream().map(logEntryResponse -> logEntryResponse.getFood().getId()).toList();
+                    final var foodData = foodDao.getByExternalIds(foodExteranlIds);
+                    final var entities = LogEntryMapper.mapResponsesToEntities(networkLogEntries, foodData);
+                    logEntryDao.deleteByDate(DateUtil.format(date));
+                    logEntryDao.insertAll(entities);
 
-                logEntryDao.deleteByDate(DateUtil.format(date));
-                logEntryDao.insertAll(entities);
-                final var datas = logEntryDao.getByDate(DateUtil.format(date));
-                final var models = LogEntryMapper.mapDatasToModels(datas);
-                mLogEntries.postValue(models);
-            });
-        }, err -> Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage()))));
+                    final var time = date.getTime() - (1000 * 60 * 60 * 24);
+                    final var previousDay = new Date(time);
+                    getNetworkLogEntries(previousDay);
+                });
+            }, err -> Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage()))));
+        } else {
+            mSynced.postValue(true);
+        }
     }
 
-    private void setAndSyncLogEntries(final Date date, final List<LogEntryData> datas) {
-        final var models = LogEntryMapper.mapDatasToModels(datas);
-        mLogEntries.setValue(models);
-        // TODO
-//        final var requests = LogEntryMapper.mapDatasToRequests(datas);
-//        final var requestsPerMealMap = requests.stream().collect(Collectors.groupingBy(LogEntryRequest::getMeal));
-//        requestsPerMealMap.forEach((meal, requestList) -> disposables.add(logEntryClient.postEntries(requestList, date, Meal.valueOf(meal)).observeOn(AndroidSchedulers.mainThread())
-//                .subscribe()));
-    }
 }
