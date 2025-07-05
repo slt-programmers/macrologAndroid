@@ -56,7 +56,7 @@ public class AddFoodActivity extends AppCompatActivity {
         backButton.setOnClickListener(v -> finish());
 
         Intent intent = getIntent();
-        foodDto = (FoodDto) intent.getSerializableExtra("FOOD_RESPONSE");
+        foodDto = (FoodDto) intent.getSerializableExtra("FOOD");
         String foodName = intent.getStringExtra("FOOD_NAME");
 
         editFoodNameLayout = findViewById(R.id.food_name_layout);

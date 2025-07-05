@@ -11,9 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -33,7 +30,6 @@ import com.csl.macrologandroid.models.Meal;
 import com.csl.macrologandroid.util.KeyboardManager;
 import com.csl.macrologandroid.util.SpinnerSetupUtil;
 import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.Date;
 import java.util.List;
@@ -41,39 +37,26 @@ import java.util.stream.Collectors;
 
 public class EditDiaryFragment extends Fragment {
 
-    private ConstraintLayout root;
-    private AutoCompleteTextView autocompleteTextView;
-    private AutocompleteAdapter autocompleteAdapter;
-    private Spinner editPortionOrUnitSpinner;
-    private TextInputEditText editGramsOrAmount;
-    private TextInputLayout editGramsOrAmountLayout;
-    private LinearLayout logEntryLayout;
-    private Button saveButton;
     private EditDiaryViewModel viewModel;
+    private FragmentEditDiaryBinding binding;
+    private AutocompleteAdapter autocompleteAdapter;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         viewModel = new ViewModelProvider(this).get(EditDiaryViewModel.class);
-        var binding = FragmentEditDiaryBinding.inflate(inflater, container, false);
-        root = binding.getRoot();
+        binding = FragmentEditDiaryBinding.inflate(inflater, container, false);
+        var root = binding.getRoot();
         procesFragmentArguments();
 
-        final var backButton = root.findViewById(R.id.back_button);
-        backButton.setOnClickListener(v -> requireActivity().finish());
-
-        ((TextView) root.findViewById(R.id.edit_meal_type)).setText(viewModel.getSelectedMeal().name());
-        autocompleteTextView = root.findViewById(R.id.search_input);
-
+        binding.backButton.setOnClickListener(v -> requireActivity().finish());
+        binding.editMealType.setText(viewModel.getSelectedMeal().name());
         setupAutocomplete();
-        final var addButton = root.findViewById(R.id.add_button);
-        addButton.setOnClickListener(v -> addButtonClicked());
-        addButton.setEnabled(false);
+        binding.addButton.setOnClickListener(v -> addButtonClicked());
+        binding.addButton.setEnabled(false);
 
-        logEntryLayout = root.findViewById(R.id.logentry_layout);
-        saveButton = root.findViewById(R.id.save_button);
-        saveButton.setOnClickListener(v -> {
-            saveButton.setEnabled(false);
+        binding.saveButton.setOnClickListener(v -> {
+            binding.saveButton.setEnabled(false);
             viewModel.saveLogEntries();
             requireActivity().finish();
         });
@@ -85,7 +68,7 @@ public class EditDiaryFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         viewModel.getMAutocompleteFilling().observe(getViewLifecycleOwner(), (autocompleteList) -> {
             autocompleteAdapter = new AutocompleteAdapter(requireContext(), android.R.layout.simple_spinner_dropdown_item, autocompleteList);
-            autocompleteTextView.setAdapter(autocompleteAdapter);
+            binding.searchInput.setAdapter(autocompleteAdapter);
         });
         viewModel.getMLogEntries().observe(getViewLifecycleOwner(), this::addEntriesToLayout);
         viewModel.initLogEntries();
@@ -106,14 +89,14 @@ public class EditDiaryFragment extends Fragment {
     }
 
     private void setupAutocomplete() {
-        autocompleteTextView.setThreshold(2);
-        autocompleteTextView.setOnItemClickListener((parent, view, position, id) -> autocompleteItemClicked(view));
+        binding.searchInput.setThreshold(2);
+        binding.searchInput.setOnItemClickListener((parent, view, position, id) -> autocompleteItemClicked(view));
     }
 
     private void autocompleteItemClicked(final View view) {
         final var foodName = ((AppCompatCheckedTextView) view).getText().toString();
         if (isDish(foodName)) {
-            autocompleteTextView.setText("");
+            binding.searchInput.setText("");
             addDishEntry(foodName);
         } else {
             setupPortionUnitSpinner(((AppCompatCheckedTextView) view).getText().toString());
@@ -131,47 +114,42 @@ public class EditDiaryFragment extends Fragment {
         final var spinnerUtil = new SpinnerSetupUtil();
         viewModel.setSelectedFood(foodName);
 
-        editPortionOrUnitSpinner = root.findViewById(R.id.edit_portion_unit);
-        editGramsOrAmountLayout = root.findViewById(R.id.edit_grams_amount_layout);
-        editGramsOrAmount = root.findViewById(R.id.edit_grams_amount);
-
         final var prefs = requireActivity().getSharedPreferences("PREF_PORTION", MODE_PRIVATE);
-        spinnerUtil.setupPortionUnitSpinner(requireContext(), viewModel.getSelectedFood(), editPortionOrUnitSpinner, editGramsOrAmount, prefs);
+        spinnerUtil.setupPortionUnitSpinner(requireContext(), viewModel.getSelectedFood(), binding.editPortionUnit, binding.editGramsAmount, prefs);
     }
 
     private void toggleFields(final boolean visible) {
-        final var addButton = root.findViewById(R.id.add_button);
         if (visible) {
-            editPortionOrUnitSpinner.setVisibility(View.VISIBLE);
-            editGramsOrAmountLayout.setVisibility(View.VISIBLE);
-            editGramsOrAmount.requestFocus();
-            addButton.setVisibility(View.VISIBLE);
-            addButton.setEnabled(true);
+            binding.editPortionUnit.setVisibility(View.VISIBLE);
+            binding.editGramsAmountLayout.setVisibility(View.VISIBLE);
+            binding.editGramsAmount.requestFocus();
+            binding.addButton.setVisibility(View.VISIBLE);
+            binding.addButton.setEnabled(true);
         } else {
-            editPortionOrUnitSpinner.setVisibility(View.GONE);
-            editGramsOrAmountLayout.setVisibility(View.GONE);
-            addButton.setEnabled(false);
+            binding.editPortionUnit.setVisibility(View.GONE);
+            binding.editGramsAmountLayout.setVisibility(View.GONE);
+            binding.addButton.setEnabled(false);
         }
     }
 
     private void addButtonClicked() {
         toggleFields(false);
         KeyboardManager.hideKeyboard(requireActivity());
-        autocompleteTextView.setText("");
-        final var selectedPortion = (String) editPortionOrUnitSpinner.getSelectedItem();
-        final var gramsOrAmount = editGramsOrAmount.getText() != null ? editGramsOrAmount.getText().toString() : null;
+        binding.searchInput.setText("");
+        final var selectedPortion = (String) binding.editPortionUnit.getSelectedItem();
+        final var gramsOrAmount = binding.editGramsAmount.getText() != null ? binding.editGramsAmount.getText().toString() : null;
         viewModel.addSelectedFoodToEntries(selectedPortion, gramsOrAmount);
     }
 
     private void addEntriesToLayout(final List<LogEntry> logEntries) {
-        logEntryLayout.removeAllViews();
+        binding.logentryLayout.removeAllViews();
         for (var logEntry : logEntries) {
             addEntryToLayout(logEntry);
         }
     }
 
     private void addEntryToLayout(final LogEntry logEntry) {
-        final var row = (ConstraintLayout) getLayoutInflater().inflate(R.layout.layout_edit_log_entry, logEntryLayout);
+        final var row = (ConstraintLayout) getLayoutInflater().inflate(R.layout.layout_edit_log_entry, binding.logentryLayout, false);
         final var foodNameTextView = (TextView) row.findViewById(R.id.food_name);
         foodNameTextView.setText(logEntry.getFood().getName());
 
@@ -192,8 +170,8 @@ public class EditDiaryFragment extends Fragment {
         final var foodPortion = (Spinner) row.findViewById(R.id.portion_spinner);
         setupPortionSpinner(foodPortion, logEntry, foodAmount);
 
-        logEntryLayout.addView(row);
-        saveButton.setVisibility(View.VISIBLE);
+        binding.logentryLayout.addView(row);
+        binding.saveButton.setVisibility(View.VISIBLE);
     }
 
     private void setupPortionSpinner(final Spinner foodPortion, final LogEntry logEntry,

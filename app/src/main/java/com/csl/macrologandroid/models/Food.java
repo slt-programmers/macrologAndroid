@@ -1,5 +1,6 @@
 package com.csl.macrologandroid.models;
 
+import java.io.Serializable;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -9,7 +10,7 @@ import lombok.Getter;
 @Builder
 @Getter
 @AllArgsConstructor
-public class Food {
+public class Food implements Serializable {
 
     private final Long id;
     private final Long externalId;

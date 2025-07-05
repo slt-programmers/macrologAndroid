@@ -5,5 +5,6 @@
     <color name="diaryDate">@color/lightblue</color>
     <color name="dateArrow">@color/lightblue</color>
     <color name="editIcon">@color/lightblue</color>
+    <color name="text">#8AFFFFFF</color>
 
 </resources>

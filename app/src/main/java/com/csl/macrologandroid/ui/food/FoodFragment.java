@@ -1,6 +1,6 @@
 package com.csl.macrologandroid.ui.food;
 
-import android.graphics.Typeface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,6 +18,7 @@ import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.csl.macrologandroid.AddFoodActivity;
 import com.csl.macrologandroid.R;
 import com.csl.macrologandroid.databinding.FragmentFoodBinding;
 import com.csl.macrologandroid.models.Food;
@@ -25,12 +26,8 @@ import com.csl.macrologandroid.util.KeyboardManager;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
-
-import io.reactivex.rxjava3.disposables.Disposable;
 
 import static android.view.KeyEvent.KEYCODE_ENTER;
 
@@ -39,97 +36,66 @@ public class FoodFragment extends Fragment {
     private FragmentFoodBinding binding;
     private FoodViewModel foodViewModel;
 
-    private SortHeader currentSortHeader = SortHeader.FOOD;
-    private boolean sortDirectionReversed = false;
-
-    private Disposable disposable;
-
-//    private final ActivityResultLauncher<Intent> addFoodForResult = registerForActivityResult(
-//            new ActivityResultContracts.StartActivityForResult(),
-//            result -> {
-//                KeyboardManager.hideKeyboard(getActivity());
-//                if (result.getResultCode() == Activity.RESULT_OK) {
-//                    binding.search.setText("");
-//                    binding.radioGroup.check(R.id.grams_radio);
-//                    currentSortHeader = SortHeader.FOOD;
-//                    sortDirectionReversed = false;
-//
-//                    binding.loader.setVisibility(View.VISIBLE);
-//                    binding.foodTableLayout.setVisibility(View.INVISIBLE);
-//                    refreshAllFood();
-//                }
-//            }
-//    );
 
     @Override
     public View onCreateView(@NotNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = FragmentFoodBinding.inflate(inflater, container, false);
-        var root = binding.getRoot();
+        final var root = binding.getRoot();
         foodViewModel = new ViewModelProvider(this).get(FoodViewModel.class);
 
-        // TODO
-//        binding.floatingButton.setOnClickListener((v) -> {
-//            Intent intent = new Intent(this.getActivity(), AddFoodActivity.class);
-//            addFoodForResult.launch(intent);
-//        });
+        binding.floatingButton.setOnClickListener((v) -> {
+            final var intent = new Intent(this.getActivity(), AddFoodActivity.class);
+            startActivity(intent);
+        });
 
         binding.search.addTextChangedListener(watcher);
         binding.search.setOnEditorActionListener(actionListener);
         binding.search.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
         binding.radioGroup.setOnCheckedChangeListener((v, id) -> {
-            foodViewModel.setSelectedMeasurementUnit(id);
-            foodViewModel.determineGramsOrPercentage();
-            sortTable(currentSortHeader, false);
+            foodViewModel.determineGramsOrPercentage(id);
             fillTable(foodViewModel.getConvertedFood());
         });
-        foodViewModel.setSelectedMeasurementUnit(R.id.grams_radio);
 
         binding.foodHeader.setOnClickListener(v -> {
-            sortTable(SortHeader.FOOD, true);
+            foodViewModel.sortFood(FoodSortHeader.FOOD, true);
             setSortHeaderColor(binding.foodHeader);
             fillTable(foodViewModel.getConvertedFood());
         });
 
         binding.proteinHeader.setOnClickListener(v -> {
-            sortTable(SortHeader.PROTEIN, true);
+            foodViewModel.sortFood(FoodSortHeader.PROTEIN, true);
             setSortHeaderColor(binding.proteinHeader);
             fillTable(foodViewModel.getConvertedFood());
         });
 
         binding.fatHeader.setOnClickListener(v -> {
-            sortTable(SortHeader.FAT, true);
+            foodViewModel.sortFood(FoodSortHeader.FAT, true);
             setSortHeaderColor(binding.fatHeader);
             fillTable(foodViewModel.getConvertedFood());
         });
 
         binding.carbsHeader.setOnClickListener(v -> {
-            sortTable(SortHeader.CARBS, true);
+            foodViewModel.sortFood(FoodSortHeader.CARBS, true);
             setSortHeaderColor(binding.carbsHeader);
             fillTable(foodViewModel.getConvertedFood());
         });
-
         setSortHeaderColor(binding.foodHeader);
 
         return root;
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull final View view, @Nullable final Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        foodViewModel.getMFood().observe(getViewLifecycleOwner(), this::fillTable);
+        foodViewModel.getMFood().observe(getViewLifecycleOwner(), food -> {
+            foodViewModel.initFoodLists(food);
+            fillTable(food);
+        });
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (disposable != null) {
-            disposable.dispose();
-        }
-    }
-
-    private void setSortHeaderColor(TextView header) {
+    private void setSortHeaderColor(final TextView header) {
         binding.foodHeader.setTextColor(getResources().getColor(R.color.text, null));
         binding.proteinHeader.setTextColor(getResources().getColor(R.color.text, null));
         binding.fatHeader.setTextColor(getResources().getColor(R.color.text, null));
@@ -137,55 +103,30 @@ public class FoodFragment extends Fragment {
         header.setTextColor(getResources().getColor(R.color.darkblue, null));
     }
 
-    private void selectFood(final String foodName) {
-//        var intent = new Intent(getContext(), AddFoodActivity.class);
-//        Food food = null;
-//        for (var response : allFood) {
-//            if (response.getName().equals(foodName)) {
-//                food = response;
-//                break;
-//            }
-//        }
-//
-//        intent.putExtra("FOOD_RESPONSE", food);
-//        addFoodForResult.launch(intent);
+    private void selectFood(final Food food) {
+        final var intent = new Intent(getContext(), AddFoodActivity.class);
+        intent.putExtra("FOOD", food);
+        startActivity(intent);
     }
 
-    private void refreshAllFood() {
-//        FoodCache.getInstance().clearCache();
-//        FoodClient foodClient = new FoodClient(getContext());
-//        disposable = foodClient.getAllFood()
-//                .subscribe(res ->
-//                {
-//                    FoodCache.getInstance().addToCache(res);
-//                    allFood = res;
-//                    searchedFood = allFood;
-//                    convertedFood = searchedFood;
-//                    fillTable(convertedFood);
-//                }, err -> Log.e(this.getClass().getName(), err.toString()));
-    }
-
-
-
-    private void fillTable(List<Food> selection) {
+    private void fillTable(final List<Food> selection) {
         binding.foodTableLayout.removeAllViews();
         binding.foodTableLayout.addView(binding.foodTableHeader);
 
         for (var food : selection) {
-            var row = new TableRow(getContext());
-            var foodName = getCustomizedTextView(new TextView(getContext()));
-            var lp = new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+            final var row = new TableRow(getContext());
+            final var foodName = getCustomizedTextView(new TextView(getContext()));
+            final var lp = new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT, 8.0f);
 
             foodName.setText(food.getName());
             foodName.setLayoutParams(lp);
             foodName.setClickable(true);
-            // TODO
-//            foodName.setOnClickListener(v -> selectFood(food.getName()));
+            foodName.setOnClickListener(v -> selectFood(food));
 
-            TextView protein = getDecimalNumberTextView(food.getProtein());
-            TextView fat = getDecimalNumberTextView(food.getFat());
-            TextView carbs = getDecimalNumberTextView(food.getCarbs());
+            final var protein = getDecimalNumberTextView(food.getProtein());
+            final var fat = getDecimalNumberTextView(food.getFat());
+            final var carbs = getDecimalNumberTextView(food.getCarbs());
 
             row.addView(foodName);
             row.addView(protein);
@@ -193,45 +134,14 @@ public class FoodFragment extends Fragment {
             row.addView(carbs);
             binding.foodTableLayout.addView(row);
         }
-
-        binding.loader.setVisibility(View.GONE);
-        binding.foodTableLayout.setVisibility(View.VISIBLE);
     }
 
-    private void sortTable(SortHeader sortHeader, boolean flip) {
-        binding.foodTableLayout.setVisibility(View.INVISIBLE);
-        binding.loader.setVisibility(View.VISIBLE);
 
-        if (sortHeader == currentSortHeader && flip) {
-            sortDirectionReversed = !sortDirectionReversed;
-        }
-
-        switch (sortHeader) {
-            case PROTEIN:
-                foodViewModel.getConvertedFood().sort((o1, o2) -> Double.compare(o2.getProtein(), o1.getProtein()));
-                break;
-            case FAT:
-                foodViewModel.getConvertedFood().sort((o1, o2) -> Double.compare(o2.getFat(), o1.getFat()));
-                break;
-            case CARBS:
-                foodViewModel.getConvertedFood().sort((o1, o2) -> Double.compare(o2.getCarbs(), o1.getCarbs()));
-                break;
-            default:
-                foodViewModel.getConvertedFood().sort(Comparator.comparing(Food::getName));
-
-        }
-
-        if (sortDirectionReversed) {
-            Collections.reverse(foodViewModel.getConvertedFood());
-        }
-
-        currentSortHeader = sortHeader;
-    }
 
     private TextView getDecimalNumberTextView(double text) {
-        TextView view = new TextView(getContext());
+        final var view = new TextView(getContext());
         view.setText(String.format(Locale.ENGLISH, "%.1f", text));
-        Typeface typeface = ResourcesCompat.getFont(requireContext(), R.font.assistant_light);
+        final var typeface = ResourcesCompat.getFont(requireContext(), R.font.assistant_light);
         view.setTypeface(typeface);
         setTextViewLayout(view);
         return getCustomizedTextView(view);
@@ -244,7 +154,7 @@ public class FoodFragment extends Fragment {
     }
 
     private void setTextViewLayout(TextView view) {
-        TableRow.LayoutParams lp = new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
+        final var lp = new TableRow.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT, 0.1f);
         view.setLayoutParams(lp);
         view.setGravity(Gravity.END);
@@ -258,8 +168,6 @@ public class FoodFragment extends Fragment {
         @Override
         public void onTextChanged(CharSequence chars, int start, int before, int count) {
             foodViewModel.searchFood(chars);
-            foodViewModel.determineGramsOrPercentage();
-            sortTable(currentSortHeader, false);
             fillTable(foodViewModel.getConvertedFood());
         }
 
@@ -276,9 +184,5 @@ public class FoodFragment extends Fragment {
         }
         return false;
     };
-
-    enum SortHeader {
-        FOOD, PROTEIN, FAT, CARBS
-    }
 
 }

@@ -11,32 +11,40 @@ import com.csl.macrologandroid.data.repositories.FoodRepository;
 import com.csl.macrologandroid.models.Food;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
 public class FoodViewModel extends AndroidViewModel {
 
+    private final FoodRepository foodRepository;
     private final MutableLiveData<List<Food>> mFood;
 
+    private final List<Food> allFood = new ArrayList<>();
     private List<Food> searchedFood = new ArrayList<>();
     private List<Food> convertedFood = new ArrayList<>();
-
-    @Setter
-    private int selectedMeasurementUnit;
+    private FoodSortHeader currentSortHeader = FoodSortHeader.FOOD;
+    private boolean sortDirectionReversed = false;
+    private int selectedMeasurementUnit = R.id.grams_radio;
 
     public FoodViewModel(@NonNull Application application) {
         super(application);
-        var foodRepository = new FoodRepository(application);
+        foodRepository = new FoodRepository(application);
 
         mFood = foodRepository.getMFood();
         foodRepository.getFood();
     }
 
+    public void initFoodLists(final List<Food> food) {
+        allFood.addAll(food);
+        searchedFood.addAll(food);
+        convertedFood.addAll(food);
+    }
+
     public void searchFood(final CharSequence chars) {
-        var allFood = mFood.getValue() != null ? mFood.getValue() : new ArrayList<Food>();
         searchedFood.clear();
         if (chars == null || chars.toString().isEmpty()) {
             searchedFood = allFood;
@@ -47,14 +55,17 @@ public class FoodViewModel extends AndroidViewModel {
                 }
             }
         }
+        determineGramsOrPercentage(selectedMeasurementUnit);
     }
 
-    public void determineGramsOrPercentage() {
+    public void determineGramsOrPercentage(final int measurementUnit) {
+        selectedMeasurementUnit = measurementUnit;
         if (selectedMeasurementUnit == R.id.grams_radio) {
             convertedFood = searchedFood;
         } else {
             convertedFood = convertGramsToPercentage(searchedFood);
         }
+        sortFood(currentSortHeader, false);
     }
 
     private List<Food> convertGramsToPercentage(final List<Food> foodlist) {
@@ -68,11 +79,36 @@ public class FoodViewModel extends AndroidViewModel {
                     (food.getProtein() / total * 100),
                     (food.getFat() / total * 100),
                     (food.getCarbs() / total * 100),
-                    null
+                    food.getPortions()
             );
             result.add(foodPercentage);
         }
         return result;
+    }
+
+    public void sortFood(final FoodSortHeader sortHeader, boolean flip) {
+        if (sortHeader == currentSortHeader && flip) {
+            sortDirectionReversed = !sortDirectionReversed;
+        }
+        currentSortHeader = sortHeader;
+
+        switch (sortHeader) {
+            case PROTEIN:
+                convertedFood.sort((o1, o2) -> Double.compare(o2.getProtein(), o1.getProtein()));
+                break;
+            case FAT:
+                convertedFood.sort((o1, o2) -> Double.compare(o2.getFat(), o1.getFat()));
+                break;
+            case CARBS:
+                convertedFood.sort((o1, o2) -> Double.compare(o2.getCarbs(), o1.getCarbs()));
+                break;
+            default:
+                convertedFood.sort(Comparator.comparing(Food::getName));
+        }
+
+        if (sortDirectionReversed) {
+            Collections.reverse(convertedFood);
+        }
     }
 
 }

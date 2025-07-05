@@ -1,10 +1,8 @@
 package com.csl.macrologandroid;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
-import com.csl.macrologandroid.lifecycle.Session;
 import com.csl.macrologandroid.ui.diary.EditDiaryFragment;
 
 public class EditEntryActivity extends AppCompatActivity {
@@ -23,20 +21,21 @@ public class EditEntryActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        Session.resetTimestamp();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (Session.getInstance().isExpired()) {
-            Intent intent = new Intent(EditEntryActivity.this, StartupActivity.class);
-            intent.putExtra("SESSION_EXPIRED", true);
-            startActivity(intent);
-        }
-    }
+    // TODO is this still needed?
+//    @Override
+//    public void onPause() {
+//        super.onPause();
+//        Session.resetTimestamp();
+//    }
+//
+//    @Override
+//    public void onResume() {
+//        super.onResume();
+//        if (Session.getInstance().isExpired()) {
+//            var intent = new Intent(EditEntryActivity.this, StartupActivity.class);
+//            intent.putExtra("SESSION_EXPIRED", true);
+//            startActivity(intent);
+//        }
+//    }
 
 }
