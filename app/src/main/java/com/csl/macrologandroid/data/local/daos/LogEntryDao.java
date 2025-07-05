@@ -1,9 +1,8 @@
 package com.csl.macrologandroid.data.local.daos;
 
-import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
-import androidx.room.Delete;
 import androidx.room.Insert;
+import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Transaction;
 
@@ -23,11 +22,11 @@ public interface LogEntryDao {
     @Query("select * from logentries where day = :date and meal = :meal")
     List<LogEntryData> getLogEntriesByDateAndMeal(final String date, final String meal);
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(final List<LogEntryEntity> logEntryEntities);
 
-    @Delete
-    void delete(final LogEntryEntity logEntryEntity);
+    @Query("delete from logentries where id = :id")
+    void delete(final Long id);
 
     @Query("delete from logentries where day = :date")
     void deleteByDate(final String date);

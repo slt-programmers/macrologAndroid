@@ -49,14 +49,13 @@ public class EditDiaryFragment extends Fragment {
     private TextInputLayout editGramsOrAmountLayout;
     private LinearLayout logEntryLayout;
     private Button saveButton;
-    private FragmentEditDiaryBinding binding;
     private EditDiaryViewModel viewModel;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         viewModel = new ViewModelProvider(this).get(EditDiaryViewModel.class);
-        binding = FragmentEditDiaryBinding.inflate(inflater, container, false);
+        var binding = FragmentEditDiaryBinding.inflate(inflater, container, false);
         root = binding.getRoot();
         procesFragmentArguments();
 
@@ -75,7 +74,8 @@ public class EditDiaryFragment extends Fragment {
         saveButton = root.findViewById(R.id.save_button);
         saveButton.setOnClickListener(v -> {
             saveButton.setEnabled(false);
-            viewModel.saveLogEntries(() -> requireActivity().finish());
+            viewModel.saveLogEntries();
+            requireActivity().finish();
         });
         return root;
     }
@@ -173,7 +173,7 @@ public class EditDiaryFragment extends Fragment {
     }
 
     private void addEntryToLayout(final LogEntry logEntry) {
-        final var row = (ConstraintLayout) getLayoutInflater().inflate(R.layout.layout_edit_log_entry, null);
+        final var row = (ConstraintLayout) getLayoutInflater().inflate(R.layout.layout_edit_log_entry, logEntryLayout);
         final var foodNameTextView = (TextView) row.findViewById(R.id.food_name);
         foodNameTextView.setText(logEntry.getFood().getName());
 

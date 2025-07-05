@@ -94,4 +94,35 @@ public class LogEntryMapper {
                 .portion(portion)
                 .build();
     }
+
+    public static List<LogEntryEntity> mapModelsToEntities(final List<LogEntry> models) {
+        return models.stream().map(LogEntryMapper::mapModelToEntity).toList();
+    }
+
+    public static LogEntryEntity mapModelToEntity(final LogEntry model) {
+        final var portionId = model.getPortion() != null ? model.getPortion().getId() : null;
+        final var id = model.getId();
+        if (id != null) {
+            // existing entry
+            return LogEntryEntity.builder()
+                    .id(model.getId())
+                    .externalId(model.getExternalId())
+                    .multiplier(model.getMultiplier())
+                    .foodId(model.getFood().getId())
+                    .portionId(portionId)
+                    .meal(model.getMeal().name())
+                    .day(model.getDay())
+                    .build();
+        } else {
+            // new entry
+            return LogEntryEntity.builder()
+                    .externalId(model.getExternalId())
+                    .multiplier(model.getMultiplier())
+                    .foodId(model.getFood().getId())
+                    .portionId(portionId)
+                    .meal(model.getMeal().name())
+                    .day(model.getDay())
+                    .build();
+        }
+    }
 }

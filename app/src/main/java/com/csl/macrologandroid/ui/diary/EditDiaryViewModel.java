@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import io.reactivex.rxjava3.disposables.Disposable;
 import lombok.Getter;
@@ -74,7 +75,7 @@ public class EditDiaryViewModel extends AndroidViewModel {
 
     public void addDishToLogEntries(final String dishName) {
         final var dish = allDishes.stream().filter(d -> dishName.equals(d.getName())).findFirst().orElse(null);
-        if (dish != null) {
+//        if (dish != null) {
 //            final var logEntriesFromIngredients = dish.getIngredients().stream()
 //                    .map(i -> IngredientResponseToLogEntryResponseMapper.map(i, selectedDate, selectedMeal))
 //                    .toList();
@@ -82,11 +83,11 @@ public class EditDiaryViewModel extends AndroidViewModel {
             // TODO
 //            logEntries.addAll(logEntriesFromIngredients);
 //            mLogEntries.setValue(logEntries);
-        }
+//        }
     }
 
     public void setSelectedFood(final String foodName) {
-        selectedFood = mAllFood.getValue().stream()
+        selectedFood = Objects.requireNonNull(mAllFood.getValue()).stream()
                 .filter(food -> foodName.trim().equals(food.getName().trim()))
                 .findFirst().orElse(null);
     }
@@ -125,20 +126,16 @@ public class EditDiaryViewModel extends AndroidViewModel {
 
     public void removeLogEntry(final LogEntry logEntry) {
         final var logEntries = new ArrayList<>(mLogEntries.getValue());
+        logEntryRepository.deleteLogEntry(logEntry.getId());
         logEntries.remove(logEntry);
         mLogEntries.setValue(logEntries);
     }
 
-    public void saveLogEntries(final Runnable callback) {
+    public void saveLogEntries() {
         final var logEntries = mLogEntries.getValue();
-//        if (logEntries != null) {
-//            final var logEntryDtos = mLogEntries.getValue().stream().map(LogEntryMapper::mapResponseToRequest).toList();
-//            disposables.add(logEntryClient.postEntries(logEntryDtos, selectedDate, selectedMeal)
-//                    .observeOn(AndroidSchedulers.mainThread())
-//                    .subscribe(res -> callback.run(),
-//                            err -> Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage())))
-//            );
-//        }
+        if (logEntries != null) {
+            logEntryRepository.saveLogEntries(logEntries, selectedDate);
+        }
     }
 
     private void getLogEntries() {

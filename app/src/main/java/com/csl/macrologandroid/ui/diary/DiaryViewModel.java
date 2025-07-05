@@ -38,8 +38,6 @@ public class DiaryViewModel extends AndroidViewModel {
     @Getter
     private final MutableLiveData<List<LogEntry>> mLogEntries;
     @Getter
-    private final MutableLiveData<List<LogEntry>> mLocalLogEntries;
-    @Getter
     private final MutableLiveData<List<ActivityResponse>> mActivities;
     @Getter
     private final List<LogEntry> breakfastEntries = new ArrayList<>();
@@ -64,20 +62,16 @@ public class DiaryViewModel extends AndroidViewModel {
 
     private final List<Disposable> disposables = new ArrayList<>();
 
-    public DiaryViewModel(final Application application) {
-        super(application);
-        final var token = application.getApplicationContext().getSharedPreferences("AUTH", Context.MODE_PRIVATE).getString("TOKEN", null);
+    public DiaryViewModel(final Application app) {
+        super(app);
+        final var token = app.getApplicationContext().getSharedPreferences("AUTH", Context.MODE_PRIVATE).getString("TOKEN", null);
         this.userService = new UserService(token);
-        this.logEntryRepository = new LogEntryRepository(application);
+        this.logEntryRepository = new LogEntryRepository(app);
         this.activityService = new ActivityService(token);
         mUserSettings = new MutableLiveData<>();
         mLogEntries = new MutableLiveData<>();
-        mLocalLogEntries = logEntryRepository.getMLogEntries();
         mActivities = new MutableLiveData<>();
         initUserSettings();
-        getLocalLogEntries(selectedDate);
-//        getLogEntries(selectedDate);
-        getActivities(selectedDate);
     }
 
     public void disposeAll() {
@@ -88,10 +82,14 @@ public class DiaryViewModel extends AndroidViewModel {
         }
     }
 
+    public void loadCurrentDate() {
+        getLocalLogEntries(selectedDate);
+        getActivities(selectedDate);
+    }
+
     public void loadNextDate() {
         final var time = selectedDate.getTime() + (1000 * 60 * 60 * 24);
         selectedDate = new Date(time);
-//        getLogEntries(selectedDate);
         getLocalLogEntries(selectedDate);
         getActivities(selectedDate);
     }
@@ -99,7 +97,6 @@ public class DiaryViewModel extends AndroidViewModel {
     public void loadPreviousDate() {
         final var time = selectedDate.getTime() - (1000 * 60 * 60 * 24);
         selectedDate = new Date(time);
-//        getLogEntries(selectedDate);
         getLocalLogEntries(selectedDate);
         getActivities(selectedDate);
     }

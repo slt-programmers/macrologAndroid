@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -21,7 +22,6 @@ import com.csl.macrologandroid.EditEntryActivity;
 import com.csl.macrologandroid.R;
 import com.csl.macrologandroid.databinding.FragmentDiaryBinding;
 import com.csl.macrologandroid.dtos.ActivityResponse;
-import com.csl.macrologandroid.dtos.LogEntryResponse;
 import com.csl.macrologandroid.dtos.UserSettingsResponse;
 import com.csl.macrologandroid.models.LogEntry;
 import com.csl.macrologandroid.models.Meal;
@@ -33,7 +33,7 @@ import java.util.Locale;
 public class DiaryFragment extends Fragment {
 
     private DiaryViewModel diaryViewModel;
-    private View root;
+    private ScrollView root;
     private TextView diaryDate;
     private LinearLayout breakfastLayout;
     private LinearLayout lunchLayout;
@@ -52,7 +52,6 @@ public class DiaryFragment extends Fragment {
         final var binding = FragmentDiaryBinding.inflate(inflater, container, false);
         root = binding.getRoot();
         diaryViewModel = new ViewModelProvider(this).get(DiaryViewModel.class);
-
         createDateSelectView();
 
         final var logEntriesLayout = root.findViewById(R.id.diary_entries_layout);
@@ -84,14 +83,17 @@ public class DiaryFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         diaryViewModel.getMUserSettings().observe(getViewLifecycleOwner(), this::setGoalIntake);
-        diaryViewModel.getMLocalLogEntries().observe(getViewLifecycleOwner(), (localLogEntries) -> {
-
-        });
         diaryViewModel.getMLogEntries().observe(getViewLifecycleOwner(), (logEntries) -> {
             updateTotals();
             updateLogEntries();
         });
         diaryViewModel.getMActivities().observe(getViewLifecycleOwner(), this::updateActivities);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        diaryViewModel.loadCurrentDate();
     }
 
     @Override
@@ -130,7 +132,7 @@ public class DiaryFragment extends Fragment {
     private void updateActivities(final List<ActivityResponse> activities) {
         activitiesLayout.removeAllViews();
         if (!activities.isEmpty()) {
-            addActivityCardHeader(activitiesLayout);
+            getLayoutInflater().inflate(R.layout.layout_activity_card_header, activitiesLayout);
             for (var activity : activities) {
                 addActivityToTable(activitiesLayout, activity);
             }
@@ -146,7 +148,7 @@ public class DiaryFragment extends Fragment {
     private void fillCard(final LinearLayout cardEntriesLayout, final List<LogEntry> entries) {
         cardEntriesLayout.removeAllViews();
         if (!entries.isEmpty()) {
-            addEntryCardHeader(cardEntriesLayout);
+            getLayoutInflater().inflate(R.layout.layout_entry_card_header, cardEntriesLayout);
             for (var entry : entries) {
                 addEntryToTable(cardEntriesLayout, entry);
             }
@@ -243,18 +245,8 @@ public class DiaryFragment extends Fragment {
         }
     }
 
-    private void addEntryCardHeader(final LinearLayout layout) {
-        final var header = getLayoutInflater().inflate(R.layout.layout_entry_card_header, null);
-        layout.addView(header);
-    }
-
-    private void addActivityCardHeader(final LinearLayout layout) {
-        final var header = getLayoutInflater().inflate(R.layout.layout_activity_card_header, null);
-        layout.addView(header);
-    }
-
     private void addEntryToTable(final LinearLayout layout, final LogEntry entry) {
-        final var row = getLayoutInflater().inflate(R.layout.layout_entry_card_row, null);
+        final var row = getLayoutInflater().inflate(R.layout.layout_entry_card_row, layout, false);
         ((TextView) row.findViewById(R.id.food_name)).setText(entry.getFood().getName());
         ((TextView) row.findViewById(R.id.food_protein)).setText(String.format(Locale.ENGLISH, "%.1f", entry.getMacros().getProtein()));
         ((TextView) row.findViewById(R.id.food_fat)).setText(String.format(Locale.ENGLISH, "%.1f", entry.getMacros().getFat()));
@@ -264,7 +256,7 @@ public class DiaryFragment extends Fragment {
     }
 
     private void addActivityToTable(final LinearLayout layout, final ActivityResponse activity) {
-        final var row = getLayoutInflater().inflate(R.layout.layout_activity_card_row, null);
+        final var row = getLayoutInflater().inflate(R.layout.layout_activity_card_row, layout, false);
         ((TextView) row.findViewById(R.id.activity_name)).setText(activity.getName());
         final var link = row.findViewById(R.id.activity_link);
         if (activity.getSyncedId() != null) {

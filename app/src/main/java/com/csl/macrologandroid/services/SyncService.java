@@ -10,8 +10,6 @@ import com.csl.macrologandroid.data.repositories.LogEntryRepository;
 
 import java.util.Date;
 
-import lombok.Getter;
-
 public class SyncService {
 
     private final FoodRepository foodRepository;
