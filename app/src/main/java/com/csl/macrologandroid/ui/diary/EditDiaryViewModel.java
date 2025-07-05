@@ -134,7 +134,7 @@ public class EditDiaryViewModel extends AndroidViewModel {
     public void saveLogEntries() {
         final var logEntries = mLogEntries.getValue();
         if (logEntries != null) {
-            logEntryRepository.saveLogEntries(logEntries, selectedDate);
+            logEntryRepository.saveLogEntries(logEntries);
         }
     }
 

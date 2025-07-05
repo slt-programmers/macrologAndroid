@@ -91,17 +91,13 @@ public class LogEntryRepository {
         }
     }
 
-    public void saveLogEntries(final List<LogEntry> logEntries, final Date date) {
+    public void saveLogEntries(final List<LogEntry> logEntries) {
         final var entities = LogEntryMapper.mapModelsToEntities(logEntries);
-        LocalDatabase.databaseWriteExecutor.execute(() -> {
-            logEntryDao.insertAll(entities);
-        });
+        LocalDatabase.databaseWriteExecutor.execute(() -> logEntryDao.insertAll(entities));
     }
 
     public void deleteLogEntry(final Long id) {
-        LocalDatabase.databaseWriteExecutor.execute(() -> {
-            logEntryDao.delete(id);
-        });
+        LocalDatabase.databaseWriteExecutor.execute(() -> logEntryDao.delete(id));
     }
 
 }

@@ -107,9 +107,7 @@ public class EditDiaryFragment extends Fragment {
 
     private void setupAutocomplete() {
         autocompleteTextView.setThreshold(2);
-        autocompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
-            autocompleteItemClicked(view);
-        });
+        autocompleteTextView.setOnItemClickListener((parent, view, position, id) -> autocompleteItemClicked(view));
     }
 
     private void autocompleteItemClicked(final View view) {
