@@ -19,7 +19,7 @@ import com.csl.macrologandroid.databinding.ActivityMainBinding;
 import com.csl.macrologandroid.services.SyncService;
 import com.csl.macrologandroid.ui.diary.DiaryFragment;
 import com.csl.macrologandroid.fragments.DishFragment;
-import com.csl.macrologandroid.fragments.FoodFragment;
+import com.csl.macrologandroid.ui.food.FoodFragment;
 import com.csl.macrologandroid.fragments.UserFragment;
 import com.csl.macrologandroid.lifecycle.Session;
 import com.csl.macrologandroid.notifications.NotificationSender;

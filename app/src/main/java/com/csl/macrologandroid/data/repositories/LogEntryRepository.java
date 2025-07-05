@@ -29,7 +29,7 @@ public class LogEntryRepository {
     private final LogEntryDao logEntryDao;
     private final FoodDao foodDao;
     @Getter
-    private final MutableLiveData<List<LogEntry>> mLogEntries = new MutableLiveData<>();
+    private final MutableLiveData<List<LogEntry>> mLogEntriesForDay = new MutableLiveData<>();
     @Getter
     private final MutableLiveData<List<LogEntry>> mEditLogEntries = new MutableLiveData<>();
 
@@ -50,7 +50,7 @@ public class LogEntryRepository {
         LocalDatabase.databaseWriteExecutor.execute(() -> {
             final var localLogEntries = logEntryDao.getByDate(DateUtil.format(date));
             final var models = LogEntryMapper.mapDatasToModels(localLogEntries);
-            mLogEntries.postValue(models);
+            mLogEntriesForDay.postValue(models);
         });
     }
 

@@ -120,7 +120,7 @@ public class DiaryViewModel extends AndroidViewModel {
     }
 
     private void getLocalLogEntries(final Date date) {
-        logEntryRepository.getMLogEntries().observeForever(logEntries -> {
+        logEntryRepository.getMLogEntriesForDay().observeForever(logEntries -> {
             sortEntriesAndSetTotals(logEntries);
             mLogEntries.setValue(logEntries);
         });
