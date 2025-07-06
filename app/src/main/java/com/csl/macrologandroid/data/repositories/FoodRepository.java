@@ -66,10 +66,18 @@ public class FoodRepository {
                 insertFoodAndPortions(networkFood);
                 mSynced.postValue(true);
             });
-        }, err -> {
-            Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage()));
-        }));
+        }, err -> Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage()))));
     }
+
+    public void saveFood(final Food food) {
+        LocalDatabase.databaseWriteExecutor.execute(() -> {
+            final var entity = FoodMapper.mapModelToEntity(food);
+            final var foodId = foodDao.insert(entity);
+            final var portionEntities = PortionMapper.mapModelsToEntities(food.getPortions(), foodId);
+            portionDao.insertAll(portionEntities);
+        });
+    }
+
 
     private void insertFoodAndPortions(final List<FoodDto> foodDtos) {
         final var foodEntities = FoodMapper.mapDtosToEntities(foodDtos);

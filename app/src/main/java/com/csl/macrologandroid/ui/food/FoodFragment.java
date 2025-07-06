@@ -46,6 +46,7 @@ public class FoodFragment extends Fragment {
 
         binding.floatingButton.setOnClickListener((v) -> {
             final var intent = new Intent(this.getActivity(), AddFoodActivity.class);
+            intent.putExtra("FOOD_NAME", binding.search.getText() != null ? binding.search.getText().toString() : "");
             startActivity(intent);
         });
 
@@ -93,6 +94,12 @@ public class FoodFragment extends Fragment {
             foodViewModel.initFoodLists(food);
             fillTable(food);
         });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        foodViewModel.loadFood();
     }
 
     private void setSortHeaderColor(final TextView header) {

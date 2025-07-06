@@ -81,7 +81,7 @@
             android:name=".ChangePasswordActivity"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".EditEntryActivity"
+            android:name=".EditDiaryActivity"
             android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".ActivityActivity"

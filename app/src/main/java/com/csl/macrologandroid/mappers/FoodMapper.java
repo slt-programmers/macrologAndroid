@@ -11,6 +11,27 @@ import java.util.List;
 
 public class FoodMapper {
 
+    public static FoodEntity mapModelToEntity(final Food model) {
+        if (model.getId() != null) {
+            return FoodEntity.builder()
+                    .id(model.getId())
+                    .externalId(model.getId())
+                    .name(model.getName())
+                    .protein(model.getProtein())
+                    .fat(model.getFat())
+                    .carbs(model.getCarbs())
+                    .build();
+        } else {
+            return FoodEntity.builder()
+                    .externalId(model.getId())
+                    .name(model.getName())
+                    .protein(model.getProtein())
+                    .fat(model.getFat())
+                    .carbs(model.getCarbs())
+                    .build();
+        }
+    }
+
     public static Food mapEntityToModel(final FoodEntity entity, final List<PortionEntity> portionEntities) {
         final var portions = PortionMapper.mapEntitiesToModels(portionEntities);
         return Food.builder()
@@ -21,18 +42,6 @@ public class FoodMapper {
                 .fat(entity.getFat())
                 .carbs(entity.getCarbs())
                 .portions(portions)
-                .build();
-    }
-
-    public static FoodDto mapEntityToDto(final FoodEntity entity, final List<PortionEntity> portionEntities) {
-        final var portions = PortionMapper.mapEntitiesToDtos(portionEntities);
-        return FoodDto.builder()
-                .id(entity.getExternalId()) // Dto id is network/external
-                .protein(entity.getProtein())
-                .fat(entity.getFat())
-                .carbs(entity.getCarbs())
-                .portions(portions)
-                .name(entity.getName())
                 .build();
     }
 
@@ -70,15 +79,4 @@ public class FoodMapper {
                 .build();
     }
 
-    public static FoodDto mapDataToDto(final FoodData data) {
-        final var portions = PortionMapper.mapEntitiesToDtos(data.portionEntities);
-        return FoodDto.builder()
-                .id(data.foodEntity.getExternalId())
-                .name(data.foodEntity.getName())
-                .protein(data.foodEntity.getProtein())
-                .fat(data.foodEntity.getFat())
-                .carbs(data.foodEntity.getCarbs())
-                .portions(portions)
-                .build();
-    }
 }

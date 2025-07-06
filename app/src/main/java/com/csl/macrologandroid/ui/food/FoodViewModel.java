@@ -35,6 +35,9 @@ public class FoodViewModel extends AndroidViewModel {
         foodRepository = new FoodRepository(application);
 
         mFood = foodRepository.getMFood();
+    }
+
+    public void loadFood() {
         foodRepository.getFood();
     }
 

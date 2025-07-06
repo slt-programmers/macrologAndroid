@@ -18,7 +18,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.csl.macrologandroid.ActivityActivity;
-import com.csl.macrologandroid.EditEntryActivity;
+import com.csl.macrologandroid.EditDiaryActivity;
 import com.csl.macrologandroid.R;
 import com.csl.macrologandroid.databinding.FragmentDiaryBinding;
 import com.csl.macrologandroid.dtos.ActivityResponse;
@@ -162,7 +162,7 @@ public class DiaryFragment extends Fragment {
     }
 
     private void startEditMeal(Meal meal) {
-        final var intent = new Intent(getActivity(), EditEntryActivity.class);
+        final var intent = new Intent(getActivity(), EditDiaryActivity.class);
         intent.putExtra("DATE", diaryViewModel.getSelectedDate());
         intent.putExtra("MEAL", meal);
         startActivity(intent);

@@ -8,6 +8,29 @@ import java.util.List;
 
 public class PortionMapper {
 
+    public static List<PortionEntity> mapModelsToEntities(final List<Portion> models, final long foodId) {
+        return models.stream().map(model -> mapModelToEntity(model, foodId)).toList();
+    }
+
+    public static PortionEntity mapModelToEntity(final Portion model, final long foodId) {
+        if (model.getId() != null) {
+            return PortionEntity.builder()
+                    .id(model.getId())
+                    .externalId(model.getExternalId())
+                    .description(model.getDescription())
+                    .grams(model.getGrams())
+                    .foodId(foodId)
+                    .build();
+        } else {
+            return PortionEntity.builder()
+                    .externalId(model.getExternalId())
+                    .description(model.getDescription())
+                    .grams(model.getGrams())
+                    .foodId(foodId)
+                    .build();
+        }
+    }
+
     public static List<Portion> mapEntitiesToModels(final List<PortionEntity> entities) {
         return entities.stream().map(PortionMapper::mapEntityToModel).toList();
     }

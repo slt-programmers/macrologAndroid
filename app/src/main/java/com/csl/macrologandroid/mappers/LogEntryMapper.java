@@ -75,26 +75,6 @@ public class LogEntryMapper {
                 .build();
     }
 
-    public static List<LogEntryRequest> mapDatasToRequests(final List<LogEntryData> datas) {
-        if (datas == null) {
-            return null;
-        }
-        return datas.stream().map(LogEntryMapper::mapDataToRequest).toList();
-    }
-
-    public static LogEntryRequest mapDataToRequest(final LogEntryData data) {
-        final var food = FoodMapper.mapEntityToDto(data.foodForEntity, data.portionsForFood);
-        final var portion = PortionMapper.mapEntityToDto(data.portionForEntity);
-        return LogEntryRequest.builder()
-                .id(data.logEntryEntity.getExternalId()) // external id is for requests/responses/network
-                .multiplier(data.logEntryEntity.getMultiplier())
-                .day(data.logEntryEntity.getDay())
-                .meal(data.logEntryEntity.getMeal())
-                .food(food)
-                .portion(portion)
-                .build();
-    }
-
     public static List<LogEntryEntity> mapModelsToEntities(final List<LogEntry> models) {
         return models.stream().map(LogEntryMapper::mapModelToEntity).toList();
     }
