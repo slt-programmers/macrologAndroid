@@ -49,6 +49,16 @@ public class UserSettingsRepository {
         userSettingsDao.insert(entity);
     }
 
+    public void insertMacros(final UserSettings macros) {
+        LocalDatabase.databaseWriteExecutor.execute(() -> {
+            final var entity = userSettingsDao.get();
+            entity.setGoalProtein(macros.getGoalProtein());
+            entity.setGoalFat(macros.getGoalFat());
+            entity.setGoalCarbs(macros.getGoalCarbs());
+            userSettingsDao.insert(entity);
+        });
+    }
+
     public void getNetworkUserSettings() {
         disposables.add(userSettingsClient.getUserSettings().observeOn(AndroidSchedulers.mainThread()).subscribe(response ->
                 LocalDatabase.databaseWriteExecutor.execute(() -> {

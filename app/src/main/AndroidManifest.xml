@@ -74,7 +74,7 @@
             android:label="@string/title_edit_details"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".AdjustIntakeActivity"
+            android:name=".EditGoalActivity"
             android:label="@string/title_adjust_intake"
             android:windowSoftInputMode="adjustResize" />
         <activity

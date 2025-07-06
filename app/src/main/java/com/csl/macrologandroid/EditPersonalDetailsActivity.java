@@ -207,7 +207,7 @@ public class EditPersonalDetailsActivity extends AppCompatActivity {
             disposable = Observable.zip(obsList, i -> i)
                     .subscribe(res -> {
                         if (intake) {
-                            Intent intent = new Intent(this, AdjustIntakeActivity.class);
+                            Intent intent = new Intent(this, EditGoalActivity.class);
                             intent.putExtra("userSettings", userSettings);
                             intent.putExtra("INTAKE", true);
                             adjustIntakeForResult.launch(intent);

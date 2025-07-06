@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.csl.macrologandroid.AboutActivity;
-import com.csl.macrologandroid.AdjustIntakeActivity;
+import com.csl.macrologandroid.EditGoalActivity;
 import com.csl.macrologandroid.ChangePasswordActivity;
 import com.csl.macrologandroid.ConnectivityActivity;
 import com.csl.macrologandroid.DeleteAccountActivity;
@@ -34,14 +34,6 @@ public class UserFragment extends Fragment {
     @Setter
     private OnLogoutPressedListener onLogoutPressedListener;
 
-//    private final ActivityResultLauncher<Intent> editDetailsForResult = registerForActivityResult(
-//            new ActivityResultContracts.StartActivityForResult(),
-//            result -> {
-//                if (result.getResultCode() == Activity.RESULT_OK) {
-//                    fetchUserSettings();
-//                }
-//            });
-
 //    private final ActivityResultLauncher<Intent> deleteAccountForResult = registerForActivityResult(
 //            new ActivityResultContracts.StartActivityForResult(),
 //            result -> {
@@ -61,15 +53,16 @@ public class UserFragment extends Fragment {
             onLogoutPressedListener.onLogoutPressed();
         });
 
+        binding.header.setOnClickListener(v -> {
+            final var intent = new Intent(getActivity(), EditGoalActivity.class);
+            startActivity(intent);
+        });
+
         binding.personal.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), EditPersonalDetailsActivity.class);
 //            editDetailsForResult.launch(intent);
         });
 
-        binding.header.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), AdjustIntakeActivity.class);
-//            editDetailsForResult.launch(intent);
-        });
 
         binding.weightButton.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), WeightChartActivity.class);
