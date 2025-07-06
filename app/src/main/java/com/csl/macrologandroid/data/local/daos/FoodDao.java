@@ -28,7 +28,6 @@ public interface FoodDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insert(final FoodEntity entity);
 
-    @Query("delete from food")
-    void deleteAll();
-
+    @Query("delete from food where id = :id")
+    void delete(final Long id);
 }

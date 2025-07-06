@@ -36,6 +36,13 @@ public class AddFoodFragment extends Fragment {
 
         binding.backButton.setOnClickListener(v -> requireActivity().finish());
         binding.saveButton.setOnClickListener(v -> saveFood());
+        if (viewModel.getFoodToBeEdited() != null && viewModel.getFoodToBeEdited().getExternalId() == null) {
+            binding.deleteButton.setVisibility(View.VISIBLE);
+            binding.deleteButton.setOnClickListener(v -> {
+                viewModel.deleteFood();
+                requireActivity().finish();
+            });
+        }
         binding.plus.setOnClickListener(v -> addPortion(null));
 
         final var foodToBeEdited = viewModel.getFoodToBeEdited();
@@ -73,6 +80,11 @@ public class AddFoodFragment extends Fragment {
             portionGrams.setText(String.valueOf(portion.getGrams()));
             if (portion.getExternalId() != null) {
                 trashcan.setVisibility(View.INVISIBLE);
+            } else {
+                trashcan.setOnClickListener(v -> {
+                    binding.portionsLayout.removeView(newPortionLayout);
+                    viewModel.deletePortion(portion.getId());
+                });
             }
         } else {
             trashcan.setOnClickListener(v -> binding.portionsLayout.removeView(newPortionLayout));
@@ -142,22 +154,21 @@ public class AddFoodFragment extends Fragment {
     }
 
     private Long findIdForPortion(int index) {
-        // Edit
-//        if (foodDto != null) {
-//            List<PortionDto> portions = foodDto.getPortions();
-//            if (portions != null && !portions.isEmpty()) {
-//                try {
-//                    PortionDto portion = portions.get(index);
-//                    return portion.getId();
-//                } catch (Exception ex) {
-//                    return null;
-//                }
-//            } else {
-//                return null;
-//            }
-//        } else {
-        return null;
-//        }
+        if (viewModel.getFoodToBeEdited() != null) {
+            final var portions = viewModel.getFoodToBeEdited().getPortions();
+            if (portions != null && !portions.isEmpty()) {
+                try {
+                    final var portion = portions.get(index);
+                    return portion.getId();
+                } catch (Exception ex) {
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 
 }

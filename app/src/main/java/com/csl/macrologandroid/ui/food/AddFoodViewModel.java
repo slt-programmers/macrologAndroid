@@ -51,4 +51,12 @@ public class AddFoodViewModel extends AndroidViewModel {
         foodRepository.saveFood(foodKandidate);
         return Optional.empty();
     }
+
+    public void deletePortion(final Long id) {
+        foodRepository.deletePortion(id);
+    }
+
+    public void deleteFood() {
+        foodRepository.deleteFood(foodToBeEdited.getId());
+    }
 }

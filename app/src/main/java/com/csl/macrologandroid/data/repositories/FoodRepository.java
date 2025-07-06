@@ -61,12 +61,11 @@ public class FoodRepository {
     }
 
     public void getNetworkFood() {
-        disposables.add(foodClient.getAllFood().observeOn(AndroidSchedulers.mainThread()).subscribe(networkFood -> {
-            LocalDatabase.databaseWriteExecutor.execute(() -> {
-                insertFoodAndPortions(networkFood);
-                mSynced.postValue(true);
-            });
-        }, err -> Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage()))));
+        disposables.add(foodClient.getAllFood().observeOn(AndroidSchedulers.mainThread()).subscribe(networkFood ->
+                LocalDatabase.databaseWriteExecutor.execute(() -> {
+                    insertFoodAndPortions(networkFood);
+                    mSynced.postValue(true);
+                }), err -> Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage()))));
     }
 
     public void saveFood(final Food food) {
@@ -78,6 +77,20 @@ public class FoodRepository {
         });
     }
 
+    public void deleteFood(final long id) {
+        LocalDatabase.databaseWriteExecutor.execute(() -> {
+            // Ingredients?
+            portionDao.deleteForFood(id);
+            foodDao.delete(id);
+        });
+    }
+
+    public void deletePortion(final Long id) {
+        LocalDatabase.databaseWriteExecutor.execute(() -> {
+            // Ingredients?
+            portionDao.delete(id);
+        });
+    }
 
     private void insertFoodAndPortions(final List<FoodDto> foodDtos) {
         final var foodEntities = FoodMapper.mapDtosToEntities(foodDtos);

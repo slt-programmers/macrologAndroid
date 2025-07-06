@@ -92,7 +92,8 @@ public class FoodFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         foodViewModel.getMFood().observe(getViewLifecycleOwner(), food -> {
             foodViewModel.initFoodLists(food);
-            fillTable(food);
+            foodViewModel.searchFood(binding.search.getText() != null ? binding.search.getText().toString() : "");
+            fillTable(foodViewModel.getConvertedFood());
         });
     }
 
@@ -142,8 +143,6 @@ public class FoodFragment extends Fragment {
             binding.foodTableLayout.addView(row);
         }
     }
-
-
 
     private TextView getDecimalNumberTextView(double text) {
         final var view = new TextView(getContext());

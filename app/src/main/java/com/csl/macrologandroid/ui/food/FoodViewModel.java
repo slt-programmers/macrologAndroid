@@ -24,8 +24,8 @@ public class FoodViewModel extends AndroidViewModel {
     private final MutableLiveData<List<Food>> mFood;
 
     private final List<Food> allFood = new ArrayList<>();
-    private List<Food> searchedFood = new ArrayList<>();
-    private List<Food> convertedFood = new ArrayList<>();
+    private final List<Food> searchedFood = new ArrayList<>();
+    private final List<Food> convertedFood = new ArrayList<>();
     private FoodSortHeader currentSortHeader = FoodSortHeader.FOOD;
     private boolean sortDirectionReversed = false;
     private int selectedMeasurementUnit = R.id.grams_radio;
@@ -33,7 +33,6 @@ public class FoodViewModel extends AndroidViewModel {
     public FoodViewModel(@NonNull Application application) {
         super(application);
         foodRepository = new FoodRepository(application);
-
         mFood = foodRepository.getMFood();
     }
 
@@ -42,15 +41,18 @@ public class FoodViewModel extends AndroidViewModel {
     }
 
     public void initFoodLists(final List<Food> food) {
+        allFood.clear();
         allFood.addAll(food);
+        searchedFood.clear();
         searchedFood.addAll(food);
+        convertedFood.clear();
         convertedFood.addAll(food);
     }
 
     public void searchFood(final CharSequence chars) {
         searchedFood.clear();
         if (chars == null || chars.toString().isEmpty()) {
-            searchedFood = allFood;
+            searchedFood.addAll(allFood);
         } else {
             for (var food : allFood) {
                 if (food.getName().toLowerCase().contains(chars.toString().toLowerCase())) {
@@ -63,10 +65,11 @@ public class FoodViewModel extends AndroidViewModel {
 
     public void determineGramsOrPercentage(final int measurementUnit) {
         selectedMeasurementUnit = measurementUnit;
+        convertedFood.clear();
         if (selectedMeasurementUnit == R.id.grams_radio) {
-            convertedFood = searchedFood;
+            convertedFood.addAll(searchedFood);
         } else {
-            convertedFood = convertGramsToPercentage(searchedFood);
+            convertedFood.addAll(convertGramsToPercentage(searchedFood));
         }
         sortFood(currentSortHeader, false);
     }
