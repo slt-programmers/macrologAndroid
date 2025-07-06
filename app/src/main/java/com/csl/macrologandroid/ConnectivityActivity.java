@@ -23,7 +23,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.csl.macrologandroid.dtos.ConnectivityRequest;
 import com.csl.macrologandroid.dtos.ConnectivityResponse;
-import com.csl.macrologandroid.services.UserService;
+import com.csl.macrologandroid.data.network.UserSettingsClient;
 
 import java.net.URL;
 import java.util.Arrays;
@@ -39,7 +39,7 @@ public class ConnectivityActivity extends AppCompatActivity implements BitmapHan
 
     private final String redirectUri = "https://www.macrolog.herokuapp.com/callback";
 
-    private UserService userService;
+    private UserSettingsClient userSettingsClient;
     private LinearLayout notConnectedLayout;
     private LinearLayout connectedLayout;
     private TextView accessError;
@@ -59,7 +59,7 @@ public class ConnectivityActivity extends AppCompatActivity implements BitmapHan
         accountName = findViewById(R.id.account_name);
         accountImage = findViewById(R.id.account_image);
 
-        userService = new UserService(getToken());
+        userSettingsClient = new UserSettingsClient(getApplicationContext());
 
         handleRedirect(intent);
 //        handleGetSetting();

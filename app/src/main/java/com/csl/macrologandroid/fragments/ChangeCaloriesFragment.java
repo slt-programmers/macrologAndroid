@@ -36,8 +36,8 @@ public class ChangeCaloriesFragment extends Fragment implements ChangeGoalMacros
             userSettings = (UserSettingsResponse) getArguments().getSerializable("userSettings");
         }
         goalCalories = calculateCalories();
-        goalProtein = userSettings.getWeight() * 1.8;
-        goalFat = userSettings.getWeight() * 0.8;
+        goalProtein = userSettings.getCurrentWeight() * 1.8;
+        goalFat = userSettings.getCurrentWeight() * 0.8;
         goalCarbs = calculateCarbs();
 
         caloriesView = view.findViewById(R.id.calories_output);
@@ -68,9 +68,9 @@ public class ChangeCaloriesFragment extends Fragment implements ChangeGoalMacros
     private double calculateCalories() {
         double bmr;
         if (userSettings.getGender() == Gender.MALE) {
-            bmr = (10 *userSettings.getWeight()) + (6.25 * userSettings.getHeight()) - (5 * userSettings.getAge()) + 5;
+            bmr = (10 *userSettings.getCurrentWeight()) + (6.25 * userSettings.getHeight()) - (5 * userSettings.getAge()) + 5;
         } else {
-            bmr = (10 * userSettings.getWeight()) + (6.25 * userSettings.getHeight()) - (5 * userSettings.getAge()) - 161;
+            bmr = (10 * userSettings.getCurrentWeight()) + (6.25 * userSettings.getHeight()) - (5 * userSettings.getAge()) - 161;
         }
         return bmr * userSettings.getActivity();
     }

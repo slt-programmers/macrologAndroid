@@ -7,6 +7,11 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 import java.util.Date;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class UserSettingsResponse implements Serializable {
 
     @Expose
@@ -53,72 +58,4 @@ public class UserSettingsResponse implements Serializable {
         // Non arg constructor
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public Date getBirthday() {
-        return birthday;
-    }
-
-    public void setBirthday(Date birthday) {
-        this.birthday = birthday;
-    }
-
-    public Gender getGender() {
-        return gender;
-    }
-
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public double getWeight() {
-        return currentWeight;
-    }
-
-    public void setWeight(double currentWeight) {
-        this.currentWeight = currentWeight;
-    }
-
-    public double getActivity() {
-        return activity;
-    }
-
-    public void setActivity(double activity) {
-        this.activity = activity;
-    }
-
-    public int getGoalProtein() {
-        return goalProtein;
-    }
-
-    public int getGoalFat() {
-        return goalFat;
-    }
-
-    public int getGoalCarbs() {
-        return goalCarbs;
-    }
-
-}
+ }

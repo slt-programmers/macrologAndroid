@@ -15,7 +15,7 @@ import com.csl.macrologandroid.models.LogEntry;
 import com.csl.macrologandroid.models.Macros;
 import com.csl.macrologandroid.models.Meal;
 import com.csl.macrologandroid.services.ActivityService;
-import com.csl.macrologandroid.services.UserService;
+import com.csl.macrologandroid.data.network.UserSettingsClient;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,7 +29,7 @@ import lombok.Getter;
 
 public class DiaryViewModel extends AndroidViewModel {
 
-    private final UserService userService;
+    private final UserSettingsClient userSettingsClient;
     private final LogEntryRepository logEntryRepository;
     private final ActivityService activityService;
 
@@ -65,7 +65,7 @@ public class DiaryViewModel extends AndroidViewModel {
     public DiaryViewModel(final Application app) {
         super(app);
         final var token = app.getApplicationContext().getSharedPreferences("AUTH", Context.MODE_PRIVATE).getString("TOKEN", null);
-        this.userService = new UserService(token);
+        this.userSettingsClient = new UserSettingsClient(app.getApplicationContext());
         this.logEntryRepository = new LogEntryRepository(app);
         this.activityService = new ActivityService(token);
         mUserSettings = new MutableLiveData<>();
@@ -108,7 +108,7 @@ public class DiaryViewModel extends AndroidViewModel {
     private void initUserSettings() {
         final var settings = UserSettingsCache.getInstance().getCache();
         if (settings == null) {
-            disposables.add(userService.getUserSettings()
+            disposables.add(userSettingsClient.getUserSettings()
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribe(res -> {
                         UserSettingsCache.getInstance().updateCache(res);

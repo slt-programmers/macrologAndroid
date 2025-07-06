@@ -19,4 +19,5 @@ public interface PortionDao {
 
     @Query("delete from portions where food_id = :foodId")
     void deleteForFood(final Long foodId);
+
 }

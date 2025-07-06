@@ -26,7 +26,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.csl.macrologandroid.adapters.AutocompleteAdapter;
 import com.csl.macrologandroid.cache.DishCache;
-import com.csl.macrologandroid.cache.FoodCache;
 import com.csl.macrologandroid.dtos.DishDto;
 import com.csl.macrologandroid.dtos.FoodDto;
 import com.csl.macrologandroid.dtos.IngredientDto;
@@ -74,7 +73,7 @@ public class DishActivity extends AppCompatActivity {
         editDishName.addTextChangedListener(dishNameWatcher);
 
         searchFoodTextView = findViewById(R.id.search_food);
-        allFood = FoodCache.getInstance().getCache();
+        allFood = new ArrayList<>();
         if (allFood.size() == 0) {
             FoodClient foodClient = new FoodClient(getApplicationContext());
             foodDisposable = foodClient.getAllFood().subscribe(res -> {

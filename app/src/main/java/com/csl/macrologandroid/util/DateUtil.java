@@ -13,16 +13,16 @@ public class DateUtil {
         // No arg constructor
     }
 
-    public static String format(Date date) {
-        SimpleDateFormat standardFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+    public static String format(final Date date) {
+        final var standardFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         return standardFormat.format(date);
     }
 
-    public static Date parse(String string) {
-        SimpleDateFormat standardFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-        SimpleDateFormat shortFormat = new SimpleDateFormat("yyyy-M-d", Locale.getDefault());
-        SimpleDateFormat reversedFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
-        SimpleDateFormat reversedShortFormat = new SimpleDateFormat("d-M-yyyy", Locale.getDefault());
+    public static Date parse(final String string) {
+        final var standardFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        final var shortFormat = new SimpleDateFormat("yyyy-M-d", Locale.getDefault());
+        final var reversedFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.getDefault());
+        final var reversedShortFormat = new SimpleDateFormat("d-M-yyyy", Locale.getDefault());
 
         Date date = null;
 

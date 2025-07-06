@@ -19,7 +19,7 @@ import com.csl.macrologandroid.fragments.ChangeCaloriesFragment;
 import com.csl.macrologandroid.lifecycle.Session;
 import com.csl.macrologandroid.models.ChangeGoalMacros;
 import com.csl.macrologandroid.fragments.ChangeMacrosFragment;
-import com.csl.macrologandroid.services.UserService;
+import com.csl.macrologandroid.data.network.UserSettingsClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +31,7 @@ import okhttp3.ResponseBody;
 
 public class AdjustIntakeActivity extends AppCompatActivity {
 
-    private UserService service;
+    private UserSettingsClient service;
     private Disposable disposable;
     private UserSettingsResponse userSettings;
     private Button saveButton;
@@ -59,7 +59,7 @@ public class AdjustIntakeActivity extends AppCompatActivity {
             userSettings = (UserSettingsResponse) intent.getSerializableExtra("userSettings");
         }
 
-        service = new UserService(getToken());
+        service = new UserSettingsClient(getApplicationContext());
         if (userSettings == null) {
             disposable = service.getUserSettings().subscribe(
                     res -> {

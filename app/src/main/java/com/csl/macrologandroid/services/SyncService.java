@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.csl.macrologandroid.data.repositories.DishRepository;
 import com.csl.macrologandroid.data.repositories.FoodRepository;
 import com.csl.macrologandroid.data.repositories.LogEntryRepository;
+import com.csl.macrologandroid.data.repositories.UserSettingsRepository;
 
 import java.util.Date;
 
@@ -18,6 +19,8 @@ public class SyncService {
     private final MutableLiveData<Boolean> dishesSynced;
     private final LogEntryRepository logEntryRepository;
     private final MutableLiveData<Boolean> logEntriesSynced;
+    private final UserSettingsRepository userSettingsRepository;
+    private final MutableLiveData<Boolean> userSettingsSynced;
     private final MutableLiveData<Boolean> mAllSynced = new MutableLiveData<>(false);
     private final MutableLiveData<Boolean> mSyncNeeded = new MutableLiveData<>();
 
@@ -25,9 +28,11 @@ public class SyncService {
         foodRepository = new FoodRepository(application);
         dishRepository = new DishRepository(application);
         logEntryRepository = new LogEntryRepository(application);
+        userSettingsRepository = new UserSettingsRepository(application);
         foodSynced = foodRepository.getMSynced();
         dishesSynced = dishRepository.getMSynced();
         logEntriesSynced = logEntryRepository.getMSynced();
+        userSettingsSynced = userSettingsRepository.getMSynced();
     }
 
     public void checkSyncNeeded() {
@@ -61,6 +66,9 @@ public class SyncService {
             if (synced) logEntryRepository.getNetworkLogEntries(new Date());
         });
         logEntriesSynced.observeForever(synced -> {
+            if (synced) userSettingsRepository.getNetworkUserSettings();
+        });
+        userSettingsSynced.observeForever(synced -> {
             if (synced) mAllSynced.postValue(true);
         });
         foodRepository.getNetworkFood();

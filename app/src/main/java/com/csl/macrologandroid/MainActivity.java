@@ -12,15 +12,13 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.csl.macrologandroid.cache.ActivityCache;
-import com.csl.macrologandroid.cache.DiaryLogCache;
-import com.csl.macrologandroid.cache.FoodCache;
 import com.csl.macrologandroid.cache.UserSettingsCache;
 import com.csl.macrologandroid.databinding.ActivityMainBinding;
 import com.csl.macrologandroid.services.SyncService;
 import com.csl.macrologandroid.ui.diary.DiaryFragment;
 import com.csl.macrologandroid.fragments.DishFragment;
 import com.csl.macrologandroid.ui.food.FoodFragment;
-import com.csl.macrologandroid.fragments.UserFragment;
+import com.csl.macrologandroid.ui.user.UserFragment;
 import com.csl.macrologandroid.lifecycle.Session;
 import com.csl.macrologandroid.notifications.NotificationSender;
 import com.csl.macrologandroid.ui.login.LoginActivity;
@@ -32,7 +30,6 @@ public class MainActivity extends AppCompatActivity implements UserFragment.OnLo
 
     private BottomNavigationView navigation;
 
-    private ActivityMainBinding binding;
     private SyncService syncService;
 
     private final ActivityResultLauncher<Intent> loginRegisterForResult =
@@ -104,8 +101,6 @@ public class MainActivity extends AppCompatActivity implements UserFragment.OnLo
     private void logout() {
         getSharedPreferences("AUTH", MODE_PRIVATE).edit().remove("TOKEN").remove("USER").apply();
         UserSettingsCache.getInstance().clearCache();
-        FoodCache.getInstance().clearCache();
-        DiaryLogCache.getInstance().clearCache();
         ActivityCache.getInstance().clearCache();
         loginRegisterForResult.launch(new Intent(this, LoginActivity.class));
         navigation.callOnClick();

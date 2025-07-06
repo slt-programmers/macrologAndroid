@@ -12,23 +12,31 @@ import com.csl.macrologandroid.data.local.daos.FoodDao;
 import com.csl.macrologandroid.data.local.daos.IngredientDao;
 import com.csl.macrologandroid.data.local.daos.LogEntryDao;
 import com.csl.macrologandroid.data.local.daos.PortionDao;
+import com.csl.macrologandroid.data.local.daos.UserSettingsDao;
 import com.csl.macrologandroid.data.local.entities.DishEntity;
 import com.csl.macrologandroid.data.local.entities.FoodEntity;
 import com.csl.macrologandroid.data.local.entities.IngredientEntity;
 import com.csl.macrologandroid.data.local.entities.LogEntryEntity;
 import com.csl.macrologandroid.data.local.entities.PortionEntity;
+import com.csl.macrologandroid.data.local.entities.UserSettingsEntity;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 @Database(entities = {LogEntryEntity.class, FoodEntity.class, PortionEntity.class, DishEntity.class,
-        IngredientEntity.class}, exportSchema = false, version = 1)
+        IngredientEntity.class, UserSettingsEntity.class}, exportSchema = false, version = 1)
 public abstract class LocalDatabase extends RoomDatabase {
     public abstract LogEntryDao logEntryDao();
+
     public abstract FoodDao foodDao();
+
     public abstract PortionDao portionDao();
+
     public abstract DishDao dishDao();
+
     public abstract IngredientDao ingredientDao();
+
+    public abstract UserSettingsDao userSettingsDao();
 
     private static volatile LocalDatabase INSTANCE;
     private static final int NUMBER_OF_THREADS = 4;
