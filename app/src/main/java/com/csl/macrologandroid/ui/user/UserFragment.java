@@ -17,7 +17,6 @@ import com.csl.macrologandroid.ConnectivityActivity;
 import com.csl.macrologandroid.DeleteAccountActivity;
 import com.csl.macrologandroid.EditPersonalDetailsActivity;
 import com.csl.macrologandroid.R;
-import com.csl.macrologandroid.WeightChartActivity;
 import com.csl.macrologandroid.databinding.FragmentUserBinding;
 import com.csl.macrologandroid.models.UserSettings;
 import com.csl.macrologandroid.util.DateUtil;
@@ -61,25 +60,19 @@ public class UserFragment extends Fragment {
             startActivity(intent);
         });
 
-
-        binding.weightButton.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), WeightChartActivity.class);
-//            editDetailsForResult.launch(intent);
-        });
-
         binding.connectivityButton.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), ConnectivityActivity.class);
+            final var intent = new Intent(getActivity(), ConnectivityActivity.class);
             startActivity(intent);
         });
 
         binding.changePassword.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), ChangePasswordActivity.class);
+            final var intent = new Intent(getActivity(), ChangePasswordActivity.class);
             startActivity(intent);
         });
 
         binding.deleteAccount.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), DeleteAccountActivity.class);
-//            deleteAccountForResult.launch(intent);
+            final var intent = new Intent(getActivity(), DeleteAccountActivity.class);
+            startActivity(intent);
         });
 
         return root;
