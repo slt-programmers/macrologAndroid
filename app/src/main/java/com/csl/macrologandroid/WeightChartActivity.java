@@ -3,9 +3,6 @@ package com.csl.macrologandroid;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -15,7 +12,8 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
-import com.csl.macrologandroid.cache.UserSettingsCache;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.csl.macrologandroid.dtos.WeightRequest;
 import com.csl.macrologandroid.fragments.WeighDialogFragment;
 import com.csl.macrologandroid.services.WeightService;
@@ -154,7 +152,6 @@ public class WeightChartActivity extends AppCompatActivity {
                 disposable = weightService.postMeasurement(weightRequest)
                         .subscribe(
                                 res -> {
-                                    UserSettingsCache.getInstance().clearCache();
                                     hasBeenEdited = true;
                                     loadMeasurements();
                                 },

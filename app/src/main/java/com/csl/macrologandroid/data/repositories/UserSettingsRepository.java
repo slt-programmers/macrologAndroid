@@ -41,12 +41,24 @@ public class UserSettingsRepository {
             final var model = UserSettingsMapper.mapEntityToModel(entity);
             mUserSettings.postValue(model);
         });
-
     }
 
     public void insertUserSettings(final UserSettingsResponse response) {
         final var entity = UserSettingsMapper.mapResponseToEntity(response);
         userSettingsDao.insert(entity);
+    }
+
+    public void insertUserSettings(final UserSettings model) {
+        LocalDatabase.databaseWriteExecutor.execute(() -> {
+            final var entity = userSettingsDao.get();
+            entity.setName(model.getName());
+            entity.setBirthday(model.getBirthday());
+            entity.setGender(model.getGender());
+            entity.setHeight(model.getHeight());
+            entity.setCurrentWeight(model.getCurrentWeight());
+            entity.setActivity(model.getActivity());
+            userSettingsDao.insert(entity);
+        });
     }
 
     public void insertMacros(final UserSettings macros) {

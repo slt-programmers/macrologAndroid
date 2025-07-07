@@ -90,18 +90,7 @@
     <string name="adjust_intake_title">Set your goal intake</string>
     <string name="adjust_intake_explanation">Fill in your desired amount of macro nutrients, or choose the desired amount of calories.</string>
     <string name="general_error">Something went wrong, try again later</string>
-    <string name="about_macrolog">About Macrolog</string>
-    <string name="about_content">Macrolog was developed by two software engineers who wanted to get
-        in shape. After having used several food tracking applications we got a little tired of
-        adds and paid functions that, in our opinion, should be free. So for laughs and learning we
-        decided to take it upon ourselves to build a better app.\n\nMacrolog heavily focusses on
-        counting macro nutrients instead of counting calories. We believe that knowing what your
-        food is made up of and eating the right proportions is ultimately healthier and more
-        effective in accomplishing your physical goals than tracking just calories. Now, the
-        concept of the \"right\" proportions is somewhat debatable, and what works for one person may
-        not work for another. We won\'t pretend to know much about dieting so in the goal intake
-        edit section a few calculations and suggestions based on mainstream theory will be done,
-        which you are entirely free to ignore.\n\nIn the end, we just want to help you measure.</string>
+    
     <string name="food">Food</string>
     <string name="percentage">Percentage</string>
 

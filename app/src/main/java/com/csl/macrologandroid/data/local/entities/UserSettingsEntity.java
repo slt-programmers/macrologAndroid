@@ -22,7 +22,6 @@ public class UserSettingsEntity {
     @ColumnInfo(name = "external_id")
     private Long externalId;
     private String name;
-    private Integer age;
     private String birthday;
     private Gender gender;
     private Integer height;

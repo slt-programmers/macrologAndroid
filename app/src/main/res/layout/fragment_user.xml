@@ -270,14 +270,6 @@
                     android:text="@string/change_password" />
 
                 <Button
-                    android:id="@+id/about_button"
-                    style="@style/buttonGradient"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    android:text="@string/about_macrolog" />
-
-                <Button
                     android:id="@+id/delete_account"
                     style="@style/buttonGradient"
                     android:layout_width="match_parent"

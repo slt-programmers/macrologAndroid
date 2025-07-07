@@ -22,9 +22,9 @@ import com.csl.macrologandroid.EditDiaryActivity;
 import com.csl.macrologandroid.R;
 import com.csl.macrologandroid.databinding.FragmentDiaryBinding;
 import com.csl.macrologandroid.dtos.ActivityResponse;
-import com.csl.macrologandroid.dtos.UserSettingsResponse;
 import com.csl.macrologandroid.models.LogEntry;
 import com.csl.macrologandroid.models.Meal;
+import com.csl.macrologandroid.models.UserSettings;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -174,7 +174,7 @@ public class DiaryFragment extends Fragment {
         startActivity(intent);
     }
 
-    private void setGoalIntake(final UserSettingsResponse settings) {
+    private void setGoalIntake(final UserSettings settings) {
         goalProtein = settings.getGoalProtein();
         setMaxProtein(settings.getGoalProtein());
         goalFat = settings.getGoalFat();

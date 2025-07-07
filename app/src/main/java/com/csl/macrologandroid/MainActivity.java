@@ -12,8 +12,6 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.csl.macrologandroid.cache.ActivityCache;
-import com.csl.macrologandroid.cache.UserSettingsCache;
-import com.csl.macrologandroid.databinding.ActivityMainBinding;
 import com.csl.macrologandroid.services.SyncService;
 import com.csl.macrologandroid.ui.diary.DiaryFragment;
 import com.csl.macrologandroid.fragments.DishFragment;
@@ -100,7 +98,6 @@ public class MainActivity extends AppCompatActivity implements UserFragment.OnLo
 
     private void logout() {
         getSharedPreferences("AUTH", MODE_PRIVATE).edit().remove("TOKEN").remove("USER").apply();
-        UserSettingsCache.getInstance().clearCache();
         ActivityCache.getInstance().clearCache();
         loginRegisterForResult.launch(new Intent(this, LoginActivity.class));
         navigation.callOnClick();

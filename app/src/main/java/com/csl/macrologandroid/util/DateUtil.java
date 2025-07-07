@@ -4,6 +4,7 @@ import android.util.Log;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.Locale;
 
@@ -49,5 +50,12 @@ public class DateUtil {
         }
 
         return date;
+    }
+
+    public static Integer birthdayToAge(final String birthday) {
+        final var date = parse(birthday);
+        final var currentYear = LocalDate.now().getYear();
+        // TODO fix
+        return 30;
     }
 }

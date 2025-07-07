@@ -6,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.text.method.PasswordTransformationMethod;
 import android.widget.Button;
 
-import com.csl.macrologandroid.cache.UserSettingsCache;
 import com.csl.macrologandroid.services.AuthenticationService;
 
 import java.util.Objects;
@@ -40,7 +39,6 @@ public class DeleteAccountActivity extends AppCompatActivity {
         AuthenticationService authService = new AuthenticationService(getToken());
         disposable = authService.deleteAccount(password)
                 .subscribe(res -> {
-                    UserSettingsCache.getInstance().clearCache();
                     setResult(RESULT_OK);
                     finish();
                 }, err -> {

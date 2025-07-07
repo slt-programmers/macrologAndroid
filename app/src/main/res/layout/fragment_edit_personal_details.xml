@@ -7,7 +7,7 @@
     android:background="@drawable/background_gradient"
     android:gravity="center_horizontal"
     android:orientation="vertical"
-    tools:context=".ui.login.LoginActivity">
+    tools:context=".ui.user.EditPersonalDetailsFragment">
 
     <Button
         android:id="@+id/back_button"
@@ -78,7 +78,7 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <RadioGroup
-                android:id="@+id/radiogroup_gender"
+                android:id="@+id/radio_group_gender"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -146,8 +146,17 @@
                 android:prompt="@string/activity_level"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
 
+
+            <TextView
+                android:id="@+id/error_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/red"
+                android:textSize="20sp"
+                android:visibility="gone" />
+
             <Button
-                android:id="@+id/savebutton"
+                android:id="@+id/saveButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"

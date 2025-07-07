@@ -10,7 +10,6 @@ import lombok.Getter;
 public class UserSettings {
 
     private String name;
-    private Integer age;
     private String birthday;
     private Gender gender;
     private Integer height;

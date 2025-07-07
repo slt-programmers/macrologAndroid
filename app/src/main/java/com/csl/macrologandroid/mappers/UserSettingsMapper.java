@@ -11,7 +11,6 @@ public class UserSettingsMapper {
     public static UserSettingsEntity mapResponseToEntity(final UserSettingsResponse response) {
         return UserSettingsEntity.builder()
                 .name(response.getName())
-                .age(response.getAge())
                 .height(response.getHeight())
                 .currentWeight(response.getCurrentWeight())
                 .activity(response.getActivity())
@@ -25,7 +24,6 @@ public class UserSettingsMapper {
     public static UserSettings mapEntityToModel(final UserSettingsEntity entity) {
         return UserSettings.builder()
                 .name(entity.getName())
-                .age(entity.getAge())
                 .height(entity.getHeight())
                 .currentWeight(entity.getCurrentWeight())
                 .activity(entity.getActivity())

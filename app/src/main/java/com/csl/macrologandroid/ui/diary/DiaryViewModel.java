@@ -7,34 +7,32 @@ import android.util.Log;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
-import com.csl.macrologandroid.cache.UserSettingsCache;
 import com.csl.macrologandroid.data.repositories.LogEntryRepository;
+import com.csl.macrologandroid.data.repositories.UserSettingsRepository;
 import com.csl.macrologandroid.dtos.ActivityResponse;
-import com.csl.macrologandroid.dtos.UserSettingsResponse;
 import com.csl.macrologandroid.models.LogEntry;
 import com.csl.macrologandroid.models.Macros;
 import com.csl.macrologandroid.models.Meal;
+import com.csl.macrologandroid.models.UserSettings;
 import com.csl.macrologandroid.services.ActivityService;
-import com.csl.macrologandroid.data.network.UserSettingsClient;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-
+import io.reactivex.rxjava3.disposables.Disposable;
 import lombok.Getter;
 
 public class DiaryViewModel extends AndroidViewModel {
 
-    private final UserSettingsClient userSettingsClient;
+    private final UserSettingsRepository userSettingsRepository;
     private final LogEntryRepository logEntryRepository;
     private final ActivityService activityService;
 
     @Getter
-    private final MutableLiveData<UserSettingsResponse> mUserSettings;
+    private final MutableLiveData<UserSettings> mUserSettings;
     @Getter
     private final MutableLiveData<List<LogEntry>> mLogEntries;
     @Getter
@@ -65,13 +63,12 @@ public class DiaryViewModel extends AndroidViewModel {
     public DiaryViewModel(final Application app) {
         super(app);
         final var token = app.getApplicationContext().getSharedPreferences("AUTH", Context.MODE_PRIVATE).getString("TOKEN", null);
-        this.userSettingsClient = new UserSettingsClient(app.getApplicationContext());
+        this.userSettingsRepository = new UserSettingsRepository(app);
         this.logEntryRepository = new LogEntryRepository(app);
         this.activityService = new ActivityService(token);
-        mUserSettings = new MutableLiveData<>();
+        mUserSettings = userSettingsRepository.getMUserSettings();
         mLogEntries = new MutableLiveData<>();
         mActivities = new MutableLiveData<>();
-        initUserSettings();
     }
 
     public void disposeAll() {
@@ -83,6 +80,7 @@ public class DiaryViewModel extends AndroidViewModel {
     }
 
     public void loadCurrentDate() {
+        userSettingsRepository.getUserSettings();
         getLocalLogEntries(selectedDate);
         getActivities(selectedDate);
     }
@@ -103,20 +101,6 @@ public class DiaryViewModel extends AndroidViewModel {
 
     public void syncActivities() {
         getActivities(selectedDate);
-    }
-
-    private void initUserSettings() {
-        final var settings = UserSettingsCache.getInstance().getCache();
-        if (settings == null) {
-            disposables.add(userSettingsClient.getUserSettings()
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribe(res -> {
-                        UserSettingsCache.getInstance().updateCache(res);
-                        mUserSettings.setValue(res);
-                    }, err -> Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage()))));
-        } else {
-            mUserSettings.setValue(settings);
-        }
     }
 
     private void getLocalLogEntries(final Date date) {

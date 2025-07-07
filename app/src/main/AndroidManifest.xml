@@ -86,10 +86,6 @@
         <activity
             android:name=".ActivityActivity"
             android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".AboutActivity"
-            android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".WeightChartActivity" />
 
         <receiver
             android:name=".notifications.NotificationReceiver"

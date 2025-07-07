@@ -11,7 +11,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.csl.macrologandroid.AboutActivity;
 import com.csl.macrologandroid.EditGoalActivity;
 import com.csl.macrologandroid.ChangePasswordActivity;
 import com.csl.macrologandroid.ConnectivityActivity;
@@ -21,6 +20,7 @@ import com.csl.macrologandroid.R;
 import com.csl.macrologandroid.WeightChartActivity;
 import com.csl.macrologandroid.databinding.FragmentUserBinding;
 import com.csl.macrologandroid.models.UserSettings;
+import com.csl.macrologandroid.util.DateUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -49,9 +49,7 @@ public class UserFragment extends Fragment {
         final var root = binding.getRoot();
         viewModel = new ViewModelProvider(this).get(UserViewModel.class);
 
-        binding.logoutButton.setOnClickListener(v -> {
-            onLogoutPressedListener.onLogoutPressed();
-        });
+        binding.logoutButton.setOnClickListener(v -> onLogoutPressedListener.onLogoutPressed());
 
         binding.header.setOnClickListener(v -> {
             final var intent = new Intent(getActivity(), EditGoalActivity.class);
@@ -59,8 +57,8 @@ public class UserFragment extends Fragment {
         });
 
         binding.personal.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), EditPersonalDetailsActivity.class);
-//            editDetailsForResult.launch(intent);
+            final var intent = new Intent(getActivity(), EditPersonalDetailsActivity.class);
+            startActivity(intent);
         });
 
 
@@ -76,11 +74,6 @@ public class UserFragment extends Fragment {
 
         binding.changePassword.setOnClickListener(v -> {
             Intent intent = new Intent(getActivity(), ChangePasswordActivity.class);
-            startActivity(intent);
-        });
-
-        binding.aboutButton.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), AboutActivity.class);
             startActivity(intent);
         });
 
@@ -106,7 +99,7 @@ public class UserFragment extends Fragment {
 
     private void setUserData(final UserSettings userSettings) {
         binding.userName.setText(userSettings.getName());
-        binding.userAge.setText(String.valueOf(userSettings.getAge()));
+        binding.userAge.setText(String.valueOf(DateUtil.birthdayToAge(userSettings.getBirthday())));
         final var gender = userSettings.getGender();
         if (gender != null) {
             var genderStr = gender.toString();
