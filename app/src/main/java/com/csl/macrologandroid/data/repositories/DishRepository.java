@@ -13,7 +13,6 @@ import com.csl.macrologandroid.mappers.DishMapper;
 import com.csl.macrologandroid.mappers.IngredientMapper;
 import com.csl.macrologandroid.models.Dish;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -32,7 +31,6 @@ public class DishRepository {
 
     // Network
     private final DishClient dishClient;
-    private final List<Disposable> disposables = new ArrayList<>();
     @Getter
     private final MutableLiveData<Boolean> mSynced = new MutableLiveData<>(false);
 
@@ -51,29 +49,20 @@ public class DishRepository {
         });
     }
 
-    public void getNetworkDishes() {
-        disposables.add(dishClient.getAllDishes().observeOn(AndroidSchedulers.mainThread()).subscribe(networkDishes -> {
-            LocalDatabase.databaseWriteExecutor.execute(() -> {
-                final var dishEntities = DishMapper.mapDtosToEntities(networkDishes);
-                dishDao.insertAll(dishEntities);
-                final var newDishes = dishDao.getAllDishes();
-                final var ingredientEntities = networkDishes.stream()
-                        .map(dishDto -> {
-                            final var dishData = newDishes.stream().filter(data -> data.dishEntity.getExternalId().equals(dishDto.getId())).toList().get(0);
-                            return IngredientMapper.mapDtosToEntities(dishDto.getIngredients(), dishData.dishEntity.getId());
-                        })
-                        .flatMap(Collection::stream).toList();
-                ingredientDao.insertAll(ingredientEntities);
-                mSynced.postValue(true);
-            });
-        }, err -> {
-            Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage()));
-        }));
+    public Disposable getNetworkDishes() {
+        return dishClient.getAllDishes().observeOn(AndroidSchedulers.mainThread()).subscribe(networkDishes -> LocalDatabase.databaseWriteExecutor.execute(() -> {
+            final var dishEntities = DishMapper.mapDtosToEntities(networkDishes);
+            dishDao.insertAll(dishEntities);
+            final var newDishes = dishDao.getAllDishes();
+            final var ingredientEntities = networkDishes.stream()
+                    .map(dishDto -> {
+                        final var dishData = newDishes.stream().filter(data -> data.dishEntity.getExternalId().equals(dishDto.getId())).toList().get(0);
+                        return IngredientMapper.mapDtosToEntities(dishDto.getIngredients(), dishData.dishEntity.getId());
+                    })
+                    .flatMap(Collection::stream).toList();
+            ingredientDao.insertAll(ingredientEntities);
+            mSynced.postValue(true);
+        }), err -> Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage())));
     }
 
-    public void disposeAll() {
-        for (var disposable : disposables) {
-            if (!disposable.isDisposed()) disposable.dispose();
-        }
-    }
 }

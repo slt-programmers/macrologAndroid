@@ -74,12 +74,6 @@ public class EditDiaryFragment extends Fragment {
         viewModel.initLogEntries();
     }
 
-    @Override
-    public void onDestroy() {
-        viewModel.disposeAll();
-        super.onDestroy();
-    }
-
     private void procesFragmentArguments() {
         final var arguments = getArguments();
         if (arguments != null) {

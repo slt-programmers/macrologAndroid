@@ -11,8 +11,6 @@ import com.csl.macrologandroid.dtos.UserSettingsResponse;
 import com.csl.macrologandroid.mappers.UserSettingsMapper;
 import com.csl.macrologandroid.models.UserSettings;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -27,7 +25,6 @@ public class UserSettingsRepository {
     private final MutableLiveData<Boolean> mSynced = new MutableLiveData<>(false);
     @Getter
     private final MutableLiveData<UserSettings> mUserSettings = new MutableLiveData<>();
-    private final List<Disposable> disposables = new ArrayList<>();
 
     public UserSettingsRepository(final Application application) {
         final var db = LocalDatabase.getDatabase(application.getApplicationContext());
@@ -71,11 +68,11 @@ public class UserSettingsRepository {
         });
     }
 
-    public void getNetworkUserSettings() {
-        disposables.add(userSettingsClient.getUserSettings().observeOn(AndroidSchedulers.mainThread()).subscribe(response ->
+    public Disposable getNetworkUserSettings() {
+        return userSettingsClient.getUserSettings().observeOn(AndroidSchedulers.mainThread()).subscribe(response ->
                 LocalDatabase.databaseWriteExecutor.execute(() -> {
                     insertUserSettings(response);
                     mSynced.postValue(true);
-                }), err -> Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage()))));
+                }), err -> Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage())));
     }
 }

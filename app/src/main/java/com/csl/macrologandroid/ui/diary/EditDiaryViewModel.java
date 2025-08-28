@@ -20,13 +20,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import io.reactivex.rxjava3.disposables.Disposable;
 import lombok.Getter;
 import lombok.Setter;
 
 public class EditDiaryViewModel extends AndroidViewModel {
 
-    private final List<Disposable> disposables = new ArrayList<>();
     private final FoodRepository foodRepository;
     private final DishRepository dishRepository;
     private final LogEntryRepository logEntryRepository;
@@ -58,17 +56,6 @@ public class EditDiaryViewModel extends AndroidViewModel {
         getDishes();
     }
 
-    @Override
-    protected void onCleared() {
-        foodRepository.disposeAll();
-        for(var disposable : disposables) {
-            if (!disposable.isDisposed()) {
-                disposable.dispose();
-            }
-        }
-        super.onCleared();
-    }
-
     public void initLogEntries() {
         getLogEntries();
     }
@@ -90,14 +77,6 @@ public class EditDiaryViewModel extends AndroidViewModel {
         selectedFood = Objects.requireNonNull(mAllFood.getValue()).stream()
                 .filter(food -> foodName.trim().equals(food.getName().trim()))
                 .findFirst().orElse(null);
-    }
-
-    public void disposeAll() {
-        for (var disposable : disposables) {
-            if (disposable != null && !disposable.isDisposed()) {
-                disposable.dispose();
-            }
-        }
     }
 
     public void addSelectedFoodToEntries(final String selectedPortionDescription, final String gramsOrAmount) {

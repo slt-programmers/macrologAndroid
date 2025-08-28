@@ -14,7 +14,6 @@ import com.csl.macrologandroid.mappers.PortionMapper;
 import com.csl.macrologandroid.models.Food;
 import com.csl.macrologandroid.data.network.FoodClient;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -33,7 +32,7 @@ public class FoodRepository {
 
     // Network
     private final FoodClient foodClient;
-    private final List<Disposable> disposables = new ArrayList<>();
+
     @Getter
     private final MutableLiveData<Boolean> mSynced = new MutableLiveData<>(false);
 
@@ -52,20 +51,12 @@ public class FoodRepository {
         });
     }
 
-    public void disposeAll() {
-        for (var disposable : disposables) {
-            if (!disposable.isDisposed()) {
-                disposable.dispose();
-            }
-        }
-    }
-
-    public void getNetworkFood() {
-        disposables.add(foodClient.getAllFood().observeOn(AndroidSchedulers.mainThread()).subscribe(networkFood ->
+    public Disposable getNetworkFood() {
+        return foodClient.getAllFood().observeOn(AndroidSchedulers.mainThread()).subscribe(networkFood ->
                 LocalDatabase.databaseWriteExecutor.execute(() -> {
                     insertFoodAndPortions(networkFood);
                     mSynced.postValue(true);
-                }), err -> Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage()))));
+                }), err -> Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage())));
     }
 
     public void saveFood(final Food food) {

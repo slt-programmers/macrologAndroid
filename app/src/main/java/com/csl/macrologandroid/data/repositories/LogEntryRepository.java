@@ -35,7 +35,6 @@ public class LogEntryRepository {
 
     // Network
     private final LogEntryClient logEntryClient;
-    private final List<Disposable> disposables = new ArrayList<>();
     @Getter
     private final MutableLiveData<Boolean> mSynced = new MutableLiveData<>(false);
 
@@ -62,33 +61,25 @@ public class LogEntryRepository {
         });
     }
 
-    public void disposeAll() {
-        disposables.forEach(disposable -> {
-            if (!disposable.isDisposed()) {
-                disposable.dispose();
-            }
-        });
-    }
-
-    public void getNetworkLogEntries(final Date date) {
+    public List<Disposable> getNetworkLogEntries(final Date date) {
         final var sevenDaysAgo = new Date(new Date().getTime() - (7 * 1000 * 60 * 60 * 24));
+        final List<Disposable> disposables = new ArrayList<>();
         if (sevenDaysAgo.before(date)) {
-            disposables.add(logEntryClient.getLogsForDay(date).observeOn(AndroidSchedulers.mainThread()).subscribe(networkLogEntries -> {
-                LocalDatabase.databaseWriteExecutor.execute(() -> {
-                    final var foodExteranlIds = networkLogEntries.stream().map(logEntryResponse -> logEntryResponse.getFood().getId()).toList();
-                    final var foodData = foodDao.getByExternalIds(foodExteranlIds);
-                    final var entities = LogEntryMapper.mapResponsesToEntities(networkLogEntries, foodData);
-                    logEntryDao.deleteByDate(DateUtil.format(date));
-                    logEntryDao.insertAll(entities);
+            disposables.add(logEntryClient.getLogsForDay(date).observeOn(AndroidSchedulers.mainThread()).subscribe(networkLogEntries -> LocalDatabase.databaseWriteExecutor.execute(() -> {
+                final var foodExteranlIds = networkLogEntries.stream().map(logEntryResponse -> logEntryResponse.getFood().getId()).toList();
+                final var foodData = foodDao.getByExternalIds(foodExteranlIds);
+                final var entities = LogEntryMapper.mapResponsesToEntities(networkLogEntries, foodData);
+                logEntryDao.deleteByDate(DateUtil.format(date));
+                logEntryDao.insertAll(entities);
 
-                    final var time = date.getTime() - (1000 * 60 * 60 * 24);
-                    final var previousDay = new Date(time);
-                    getNetworkLogEntries(previousDay);
-                });
-            }, err -> Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage()))));
+                final var time = date.getTime() - (1000 * 60 * 60 * 24);
+                final var previousDay = new Date(time);
+                getNetworkLogEntries(previousDay);
+            }), err -> Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage()))));
         } else {
             mSynced.postValue(true);
         }
+        return disposables;
     }
 
     public void saveLogEntries(final List<LogEntry> logEntries) {

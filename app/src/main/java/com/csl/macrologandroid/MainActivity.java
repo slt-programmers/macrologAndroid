@@ -96,6 +96,12 @@ public class MainActivity extends AppCompatActivity implements UserFragment.OnLo
         Session.resetTimestamp();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        syncService.disposeAll();
+    }
+
     private void logout() {
         getSharedPreferences("AUTH", MODE_PRIVATE).edit().remove("TOKEN").remove("USER").apply();
         ActivityCache.getInstance().clearCache();

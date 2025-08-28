@@ -1,42 +1,37 @@
 package com.csl.macrologandroid.ui.diary;
 
 import android.app.Application;
-import android.content.Context;
-import android.util.Log;
 
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.MutableLiveData;
 
+import com.csl.macrologandroid.data.repositories.ActivityRepository;
 import com.csl.macrologandroid.data.repositories.LogEntryRepository;
 import com.csl.macrologandroid.data.repositories.UserSettingsRepository;
-import com.csl.macrologandroid.dtos.ActivityResponse;
+import com.csl.macrologandroid.models.Activity;
 import com.csl.macrologandroid.models.LogEntry;
 import com.csl.macrologandroid.models.Macros;
 import com.csl.macrologandroid.models.Meal;
 import com.csl.macrologandroid.models.UserSettings;
-import com.csl.macrologandroid.services.ActivityService;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.disposables.Disposable;
 import lombok.Getter;
 
 public class DiaryViewModel extends AndroidViewModel {
 
     private final UserSettingsRepository userSettingsRepository;
     private final LogEntryRepository logEntryRepository;
-    private final ActivityService activityService;
+    private final ActivityRepository activityRepository;
 
     @Getter
     private final MutableLiveData<UserSettings> mUserSettings;
     @Getter
     private final MutableLiveData<List<LogEntry>> mLogEntries;
     @Getter
-    private final MutableLiveData<List<ActivityResponse>> mActivities;
+    private final MutableLiveData<List<Activity>> mActivities;
     @Getter
     private final List<LogEntry> breakfastEntries = new ArrayList<>();
     @Getter
@@ -58,44 +53,33 @@ public class DiaryViewModel extends AndroidViewModel {
     // TODO refactor to localdate
     private Date selectedDate = new Date();
 
-    private final List<Disposable> disposables = new ArrayList<>();
-
     public DiaryViewModel(final Application app) {
         super(app);
-        final var token = app.getApplicationContext().getSharedPreferences("AUTH", Context.MODE_PRIVATE).getString("TOKEN", null);
         this.userSettingsRepository = new UserSettingsRepository(app);
         this.logEntryRepository = new LogEntryRepository(app);
-        this.activityService = new ActivityService(token);
+        this.activityRepository = new ActivityRepository(getApplication());
         mUserSettings = userSettingsRepository.getMUserSettings();
         mLogEntries = new MutableLiveData<>();
         mActivities = new MutableLiveData<>();
     }
 
-    public void disposeAll() {
-        for (var disposable : disposables) {
-            if (disposable != null && !disposable.isDisposed()) {
-                disposable.dispose();
-            }
-        }
-    }
-
     public void loadCurrentDate() {
         userSettingsRepository.getUserSettings();
-        getLocalLogEntries(selectedDate);
+        getLogEntries(selectedDate);
         getActivities(selectedDate);
     }
 
     public void loadNextDate() {
         final var time = selectedDate.getTime() + (1000 * 60 * 60 * 24);
         selectedDate = new Date(time);
-        getLocalLogEntries(selectedDate);
+        getLogEntries(selectedDate);
         getActivities(selectedDate);
     }
 
     public void loadPreviousDate() {
         final var time = selectedDate.getTime() - (1000 * 60 * 60 * 24);
         selectedDate = new Date(time);
-        getLocalLogEntries(selectedDate);
+        getLogEntries(selectedDate);
         getActivities(selectedDate);
     }
 
@@ -103,7 +87,7 @@ public class DiaryViewModel extends AndroidViewModel {
         getActivities(selectedDate);
     }
 
-    private void getLocalLogEntries(final Date date) {
+    private void getLogEntries(final Date date) {
         logEntryRepository.getMLogEntriesForDay().observeForever(logEntries -> {
             sortEntriesAndSetTotals(logEntries);
             mLogEntries.setValue(logEntries);
@@ -148,8 +132,7 @@ public class DiaryViewModel extends AndroidViewModel {
     }
 
     private void getActivities(final Date date) {
-        disposables.add(activityService.getActivitiesForDay(date)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(mActivities::setValue, err -> Log.e(this.getClass().getName(), Objects.requireNonNull(err.getMessage()))));
+        activityRepository.getMActivitiesForDay().observeForever(mActivities::setValue);
+        activityRepository.getActivitiesForDay(date);
     }
 }
