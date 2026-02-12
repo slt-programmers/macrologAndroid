@@ -1,6 +1,7 @@
 package com.csl.macrologandroid.mappers;
 
 import com.csl.macrologandroid.data.local.entities.IngredientEntity;
+import com.csl.macrologandroid.data.models.IngredientData;
 import com.csl.macrologandroid.dtos.IngredientDto;
 import com.csl.macrologandroid.models.Ingredient;
 
@@ -8,30 +9,26 @@ import java.util.List;
 
 public class IngredientMapper {
 
-    public static List<Ingredient> mapDatasToModels(final List<IngredientEntity> entities) {
-        return entities.stream().map(IngredientMapper::mapDataToModel).toList();
+    public static List<Ingredient> mapDatasToModels(final List<IngredientData> datas) {
+        return datas.stream().map(IngredientMapper::mapDataToModel).toList();
     }
 
-    public static Ingredient mapDataToModel(final IngredientEntity entity) {
+    public static Ingredient mapDataToModel(final IngredientData data) {
         return Ingredient.builder()
-                .id(entity.getId())
-                .externalId(entity.getExternalId())
-                .foodId(entity.getFoodId())
-                .portionId(entity.getPortionId())
-                .multiplier(entity.getMultiplier())
+                .id(data.ingredientEntity.getId())
+                .externalId(data.ingredientEntity.getExternalId())
+                .food(FoodMapper.mapEntityToModel(data.foodEntity, List.of()))
+                .portion(PortionMapper.mapEntityToModel(data.portionEntity))
+                .multiplier(data.ingredientEntity.getMultiplier())
                 .build();
     }
 
-    public static List<IngredientEntity> mapDtosToEntities(final List<IngredientDto> dtos, final Long dishId) {
-        return dtos.stream().map(dto -> IngredientMapper.mapDtoToEntity(dto, dishId)).toList();
-    }
-
-    public static IngredientEntity mapDtoToEntity(final IngredientDto dto, final Long dishId) {
-        final var portionId = dto.getPortion() != null ? dto.getPortion().getId() : null;
+    public static IngredientEntity mapDtoToEntity(final IngredientDto dto, final Long dishId,
+                                                  final Long foodId, final Long portionId) {
         return IngredientEntity.builder()
-                // No external id, maybe a problem
-                .foodId(dto.getFood().getId())
+                .externalId(dto.getId())
                 .dishId(dishId)
+                .foodId(foodId)
                 .portionId(portionId)
                 .multiplier(dto.getMultiplier())
                 .build();

@@ -5,11 +5,14 @@ import com.csl.macrologandroid.data.models.FoodData;
 import com.csl.macrologandroid.data.models.LogEntryData;
 import com.csl.macrologandroid.dtos.LogEntryRequest;
 import com.csl.macrologandroid.dtos.LogEntryResponse;
+import com.csl.macrologandroid.models.Ingredient;
 import com.csl.macrologandroid.models.LogEntry;
 import com.csl.macrologandroid.models.Meal;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -104,5 +107,13 @@ public class LogEntryMapper {
                     .day(model.getDay())
                     .build();
         }
+    }
+
+    public static LogEntry fromIngredient(final Ingredient ingredient, final Meal meal, final String date) {
+        return LogEntry.builder()
+                .day(date)
+                .meal(meal)
+//                .food(ingredient.ge)
+                .build();
     }
 }

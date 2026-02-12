@@ -8,7 +8,7 @@ import lombok.Getter;
 @Data
 public class IngredientDto implements Serializable {
 
-    private Long id;
+    private Long id; // externalId
     private Double multiplier;
     private FoodDto food;
     private PortionDto portion;

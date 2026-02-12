@@ -61,13 +61,18 @@ public class EditDiaryViewModel extends AndroidViewModel {
     }
 
     public void addDishToLogEntries(final String dishName) {
-        final var dish = allDishes.stream().filter(d -> dishName.equals(d.getName())).findFirst().orElse(null);
-//        if (dish != null) {
+        final var optionalDish = allDishes.stream().filter(d -> dishName.equals(d.getName())).findFirst();
+//        if (optionalDish.isPresent()) {
+//            final var dish = optionalDish.get();
 //            final var logEntriesFromIngredients = dish.getIngredients().stream()
-//                    .map(i -> IngredientResponseToLogEntryResponseMapper.map(i, selectedDate, selectedMeal))
+//                    .map(ingredient -> {
+//                        return LogEntry().
+////                        IngredientResponseToLogEntryResponseMapper.map(i, selectedDate, selectedMeal)
+//
+//                    })
 //                    .toList();
 //            final var logEntries = new ArrayList<>(mLogEntries.getValue());
-            // TODO
+////             TODO
 //            logEntries.addAll(logEntriesFromIngredients);
 //            mLogEntries.setValue(logEntries);
 //        }

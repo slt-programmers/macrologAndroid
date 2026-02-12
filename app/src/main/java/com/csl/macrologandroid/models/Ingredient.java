@@ -9,8 +9,8 @@ public class Ingredient {
 
     private final Long id;
     private final Long externalId;
-    private final Long foodId;
-    private final Long portionId;
+    private final Food food;
+    private final Portion portion;
     private final Double multiplier;
 
 }
