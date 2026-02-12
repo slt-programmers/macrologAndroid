@@ -8,6 +8,7 @@ import androidx.lifecycle.MutableLiveData;
 import com.csl.macrologandroid.data.repositories.DishRepository;
 import com.csl.macrologandroid.data.repositories.FoodRepository;
 import com.csl.macrologandroid.data.repositories.LogEntryRepository;
+import com.csl.macrologandroid.mappers.LogEntryMapper;
 import com.csl.macrologandroid.models.Dish;
 import com.csl.macrologandroid.models.Food;
 import com.csl.macrologandroid.models.LogEntry;
@@ -62,20 +63,15 @@ public class EditDiaryViewModel extends AndroidViewModel {
 
     public void addDishToLogEntries(final String dishName) {
         final var optionalDish = allDishes.stream().filter(d -> dishName.equals(d.getName())).findFirst();
-//        if (optionalDish.isPresent()) {
-//            final var dish = optionalDish.get();
-//            final var logEntriesFromIngredients = dish.getIngredients().stream()
-//                    .map(ingredient -> {
-//                        return LogEntry().
-////                        IngredientResponseToLogEntryResponseMapper.map(i, selectedDate, selectedMeal)
-//
-//                    })
-//                    .toList();
-//            final var logEntries = new ArrayList<>(mLogEntries.getValue());
-////             TODO
-//            logEntries.addAll(logEntriesFromIngredients);
-//            mLogEntries.setValue(logEntries);
-//        }
+        if (optionalDish.isPresent()) {
+            final var dish = optionalDish.get();
+            final var logEntriesFromIngredients = dish.getIngredients().stream()
+                    .map(ingredient -> LogEntryMapper.fromIngredient(ingredient, selectedMeal, DateUtil.format(selectedDate)))
+                    .toList();
+            final var logEntries = new ArrayList<>(mLogEntries.getValue());
+            logEntries.addAll(logEntriesFromIngredients);
+            mLogEntries.setValue(logEntries);
+        }
     }
 
     public void setSelectedFood(final String foodName) {

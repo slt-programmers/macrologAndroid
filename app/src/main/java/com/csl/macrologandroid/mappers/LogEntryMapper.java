@@ -8,17 +8,12 @@ import com.csl.macrologandroid.dtos.LogEntryResponse;
 import com.csl.macrologandroid.models.Ingredient;
 import com.csl.macrologandroid.models.LogEntry;
 import com.csl.macrologandroid.models.Meal;
+import com.csl.macrologandroid.util.DateUtil;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class LogEntryMapper {
-
-    private static final SimpleDateFormat FORMAT = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 
     @Deprecated
     public static LogEntryRequest mapResponseToRequest(final LogEntryResponse logEntryResponse) {
@@ -27,7 +22,7 @@ public class LogEntryMapper {
                 logEntryResponse.getFood(),
                 logEntryResponse.getPortion(),
                 logEntryResponse.getMultiplier(),
-                FORMAT.format(logEntryResponse.getDay()),
+                DateUtil.format(logEntryResponse.getDay()),
                 logEntryResponse.getMeal().toString()
         );
     }
@@ -47,7 +42,7 @@ public class LogEntryMapper {
                 .toList().get(0) : null;
         return LogEntryEntity.builder()
                 .externalId((long) response.getId())
-                .day(FORMAT.format(response.getDay()))
+                .day(DateUtil.format(response.getDay()))
                 .meal(response.getMeal().name())
                 .foodId(foodData.foodEntity.getId())
                 .portionId(portionEntity != null ? portionEntity.getId() : null)
@@ -113,7 +108,9 @@ public class LogEntryMapper {
         return LogEntry.builder()
                 .day(date)
                 .meal(meal)
-//                .food(ingredient.ge)
+                .food(ingredient.getFood())
+                .portion(ingredient.getPortion())
+                .multiplier(ingredient.getMultiplier())
                 .build();
     }
 }

@@ -11,8 +11,8 @@ public class IngredientData {
 
     @Embedded
     public IngredientEntity ingredientEntity;
-    @Relation(parentColumn = "food_id", entityColumn = "id")
-    public FoodEntity foodEntity;
+    @Relation(parentColumn = "food_id", entityColumn = "id", entity = FoodEntity.class)
+    public FoodData foodData;
     @Relation(parentColumn = "portion_id", entityColumn = "id")
     public PortionEntity portionEntity;
 

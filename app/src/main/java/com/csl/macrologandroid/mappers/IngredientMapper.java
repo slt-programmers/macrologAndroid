@@ -17,7 +17,7 @@ public class IngredientMapper {
         return Ingredient.builder()
                 .id(data.ingredientEntity.getId())
                 .externalId(data.ingredientEntity.getExternalId())
-                .food(FoodMapper.mapEntityToModel(data.foodEntity, List.of()))
+                .food(FoodMapper.mapEntityToModel(data.foodData.foodEntity, data.foodData.portionEntities))
                 .portion(PortionMapper.mapEntityToModel(data.portionEntity))
                 .multiplier(data.ingredientEntity.getMultiplier())
                 .build();
